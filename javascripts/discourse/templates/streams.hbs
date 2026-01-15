@@ -1,11 +1,11 @@
 <section class="streamers-page">
   <header class="streamers-header">
-    <h1>{{i18n "streamers.title"}}</h1>
+    <h1>{{theme-i18n "streamers.title"}}</h1>
   </header>
 
   {{#if this.model.error}}
     <div class="streamers-error">
-      {{i18n "streamers.error_loading"}}
+      {{theme-i18n "streamers.error_loading"}}
     </div>
   {{else if this.model.live_streams}}
     {{#if this.model.live_streams.length}}
@@ -19,6 +19,7 @@
                 {{else}}
                   {{stream.username}}
                 {{/if}}
+
                 {{#if stream.username}}
                   <span class="streamer-username">@{{stream.username}}</span>
                 {{/if}}
@@ -26,7 +27,7 @@
 
               {{#if stream.listeners}}
                 <div class="streamer-listeners">
-                  {{i18n "streamers.listeners" count=stream.listeners}}
+                  {{theme-i18n "streamers.listeners" count=stream.listeners}}
                 </div>
               {{/if}}
             </div>
@@ -39,7 +40,7 @@
                   target="_blank"
                   rel="noopener"
                 >
-                  {{i18n "streamers.listen"}}
+                  {{theme-i18n "streamers.listen"}}
                 </a>
               {{/if}}
 
@@ -50,7 +51,7 @@
                   target="_blank"
                   rel="noopener"
                 >
-                  {{i18n "streamers.chat"}}
+                  {{theme-i18n "streamers.chat"}}
                 </a>
               {{/if}}
 
@@ -61,7 +62,7 @@
                   target="_blank"
                   rel="noopener"
                 >
-                  {{i18n "streamers.profile"}}
+                  {{theme-i18n "streamers.profile"}}
                 </a>
               {{/if}}
             </div>
@@ -71,17 +72,17 @@
 
       {{#if this.model.updated_at}}
         <div class="streamers-updated">
-          {{i18n "streamers.last_updated" time=this.model.updated_at}}
+          {{theme-i18n "streamers.last_updated" time=this.model.updated_at}}
         </div>
       {{/if}}
     {{else}}
       <p class="streamers-empty">
-        {{i18n "streamers.no_streams"}}
+        {{theme-i18n "streamers.no_streams"}}
       </p>
     {{/if}}
   {{else}}
     <p class="streamers-empty">
-      {{i18n "streamers.no_streams"}}
+      {{theme-i18n "streamers.no_streams"}}
     </p>
   {{/if}}
 </section>
