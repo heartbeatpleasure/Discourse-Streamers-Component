@@ -1,77 +1,67 @@
 .streamers-page {
-  max-width: 960px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 1.5em 1em 3em;
 
-  h1 {
+  .streamers-header {
     margin-bottom: 1em;
+
+    h1 {
+      font-size: 1.8em;
+      margin: 0 0 0.5em;
+    }
   }
 
-  .streamers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1em;
+  .streamers-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
   }
 
-  .streamers-card {
-    background: var(--secondary);
+  .streamer-card {
+    padding: 0.75em 1em;
     border-radius: 0.5em;
-    padding: 1em;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    background: var(--secondary-very-low);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
 
-    .streamers-card-header {
-      display: flex;
+  .streamer-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+
+    .streamer-username {
+      font-weight: bold;
+    }
+
+    .streamer-mount {
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+  }
+
+  .streamer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75em;
+    font-size: 0.9em;
+    opacity: 0.9;
+
+    .streamer-listeners {
+      display: inline-flex;
       align-items: center;
-      margin-bottom: 0.5em;
-
-      .streamers-avatar {
-        margin-right: 0.75em;
-      }
-
-      .streamers-card-meta {
-        .streamers-name {
-          font-weight: bold;
-        }
-
-        .streamers-username {
-          font-size: 0.85em;
-          color: var(--primary-medium);
-        }
-      }
-    }
-
-    .streamers-description {
-      margin-bottom: 0.5em;
-    }
-
-    .streamers-stats {
-      font-size: 0.85em;
-      color: var(--primary-medium);
-      margin-bottom: 0.75em;
-    }
-
-    .streamers-card-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5em;
-
-      .btn {
-        padding-inline: 0.9em;
-        padding-block: 0.35em;
-        font-size: 0.9em;
-      }
+      gap: 0.25em;
     }
   }
 
-  .streamers-empty,
-  .streamers-error {
+  .streamers-empty {
     margin-top: 1em;
-    font-style: italic;
-  }
-
-  .streamers-updated {
-    margin-top: 1.5em;
-    font-size: 0.8em;
-    color: var(--primary-medium);
+    opacity: 0.8;
   }
 }
