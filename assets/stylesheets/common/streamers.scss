@@ -1,0 +1,77 @@
+.streamers-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5em 1em 3em;
+
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  .streamers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1em;
+  }
+
+  .streamers-card {
+    background: var(--secondary);
+    border-radius: 0.5em;
+    padding: 1em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+    .streamers-card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5em;
+
+      .streamers-avatar {
+        margin-right: 0.75em;
+      }
+
+      .streamers-card-meta {
+        .streamers-name {
+          font-weight: bold;
+        }
+
+        .streamers-username {
+          font-size: 0.85em;
+          color: var(--primary-medium);
+        }
+      }
+    }
+
+    .streamers-description {
+      margin-bottom: 0.5em;
+    }
+
+    .streamers-stats {
+      font-size: 0.85em;
+      color: var(--primary-medium);
+      margin-bottom: 0.75em;
+    }
+
+    .streamers-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+
+      .btn {
+        padding-inline: 0.9em;
+        padding-block: 0.35em;
+        font-size: 0.9em;
+      }
+    }
+  }
+
+  .streamers-empty,
+  .streamers-error {
+    margin-top: 1em;
+    font-style: italic;
+  }
+
+  .streamers-updated {
+    margin-top: 1.5em;
+    font-size: 0.8em;
+    color: var(--primary-medium);
+  }
+}

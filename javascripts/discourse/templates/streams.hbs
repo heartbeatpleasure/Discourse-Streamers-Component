@@ -1,0 +1,88 @@
+<div class="streamers-page">
+  <h1>{{i18n "streamers.title"}}</h1>
+
+  {{#if model.error}}
+    <div class="streamers-error">
+      {{i18n "streamers.error_loading"}}
+    </div>
+  {{else}}
+    {{#if model.live_streams}}
+      <div class="streamers-grid">
+        {{#each model.live_streams as |stream|}}
+          <div class="streamers-card">
+            <div class="streamers-card-header">
+              <div class="streamers-avatar">
+                {{#if stream.avatar_template}}
+                  {{avatar stream usernamePath="username" size="large"}}
+                {{/if}}
+              </div>
+
+              <div class="streamers-card-meta">
+                <div class="streamers-name">
+                  {{or stream.display_name stream.username}}
+                </div>
+                <div class="streamers-username">
+                  @{{stream.username}}
+                </div>
+              </div>
+            </div>
+
+            <div class="streamers-card-body">
+              {{#if stream.description}}
+                <p class="streamers-description">
+                  {{stream.description}}
+                </p>
+              {{/if}}
+
+              <p class="streamers-stats">
+                {{#if stream.listeners}}
+                  {{i18n "streamers.listeners" count=stream.listeners}}
+                {{/if}}
+                {{#if stream.bitrate}}
+                  · {{stream.bitrate}} kbps
+                {{/if}}
+              </p>
+            </div>
+
+            <div class="streamers-card-actions">
+              {{#if stream.public_url}}
+                <a
+                  class="btn btn-primary"
+                  href={{stream.public_url}}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{i18n "streamers.listen"}}
+                </a>
+              {{/if}}
+
+              {{#if stream.username}}
+                <a
+                  class="btn btn-default"
+                  href={{user-path stream.username}}
+                >
+                  {{i18n "streamers.profile"}}
+                </a>
+              {{/if}}
+
+              {{!--
+                Hier kunnen we later nog een chat-link aan koppelen
+                zodra we weten hoe we topics / chat-kanalen willen mappen.
+              --}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="streamers-empty">
+        {{i18n "streamers.no_streams"}}
+      </p>
+    {{/if}}
+
+    {{#if model.updated_at}}
+      <p class="streamers-updated">
+        {{i18n "streamers.last_updated" time=model.updated_at}}
+      </p>
+    {{/if}}
+  {{/if}}
+</div>
