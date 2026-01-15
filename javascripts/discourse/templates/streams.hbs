@@ -1,47 +1,56 @@
-<div class="hbp-streams-page">
-  <h1>{{i18n "streamers.title"}}</h1>
+<section class="hbp-streamers">
+  <h1 class="hbp-streamers__title">
+    {{i18n "streamers.title"}}
+  </h1>
 
-  {{#if this.isLoading}}
-    <p>{{i18n "streamers.loading"}}</p>
-  {{else if this.error}}
-    <p class="hbp-streams-error">
+  {{#if this.model.error}}
+    <p class="hbp-streamers__error">
       {{i18n "streamers.error_loading"}}
     </p>
-  {{else if this.streams.length}}
-    <ul class="hbp-streams-list">
-      {{#each this.streams as |stream|}}
-        <li class="hbp-streams-item">
-          <div class="hbp-streams-main">
-            <span class="hbp-streams-username">
-              {{stream.username}}
+  {{else if this.model.live_streams}}
+    <ul class="hbp-streamers__list">
+      {{#each this.model.live_streams as |stream|}}
+        <li class="hbp-streamers__item">
+          <div class="hbp-streamers__main">
+            <span class="hbp-streamers__username">
+              {{stream.user.username}}
             </span>
 
-            {{#if stream.listeners_count}}
-              <span class="hbp-streams-listeners">
+            {{#if stream.listeners}}
+              <span class="hbp-streamers__listeners">
                 {{i18n "streamers.listeners"
-                       count=stream.listeners_count}}
+                  count=stream.listeners
+                }}
               </span>
             {{/if}}
           </div>
 
-          <div class="hbp-streams-actions">
-            <a class="btn btn-primary"
-               href={{stream.listen_url}}
-               target="_blank"
-               rel="noopener">
-              {{i18n "streamers.listen"}}
-            </a>
+          <div class="hbp-streamers__actions">
+            {{#if stream.listen_url}}
+              <a
+                class="hbp-streamers__button hbp-streamers__button--listen"
+                href={{stream.listen_url}}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{i18n "streamers.listen"}}
+              </a>
+            {{/if}}
 
-            {{#if stream.user_profile_url}}
-              <a class="btn"
-                 href={{stream.user_profile_url}}>
+            {{#if stream.profile_url}}
+              <a
+                class="hbp-streamers__button hbp-streamers__button--profile"
+                href={{stream.profile_url}}
+              >
                 {{i18n "streamers.profile"}}
               </a>
             {{/if}}
 
             {{#if stream.chat_url}}
-              <a class="btn"
-                 href={{stream.chat_url}}>
+              <a
+                class="hbp-streamers__button hbp-streamers__button--chat"
+                href={{stream.chat_url}}
+              >
                 {{i18n "streamers.chat"}}
               </a>
             {{/if}}
@@ -49,9 +58,15 @@
         </li>
       {{/each}}
     </ul>
+
+    {{#if this.model.updated_at}}
+      <p class="hbp-streamers__updated">
+        {{i18n "streamers.last_updated" time=this.model.updated_at}}
+      </p>
+    {{/if}}
   {{else}}
-    <p class="hbp-streams-empty">
+    <p class="hbp-streamers__empty">
       {{i18n "streamers.no_streams"}}
     </p>
   {{/if}}
-</div>
+</section>
