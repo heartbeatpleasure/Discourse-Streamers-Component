@@ -2,14 +2,15 @@ en:
   theme_metadata:
     description: "Frontend for the HeartbeatPleasure Streamers plugin."
 
-  streamers:
-    title: "Live audio streams"
-    no_streams: "No one is streaming right now."
-    error_loading: "There was a problem loading the live streams."
-    last_updated: "Last updated %{time}"
-    listen: "Listen"
-    profile: "Profile"
-    chat: "Open chat"
-    listeners:
-      one: "%{count} listener"
-      other: "%{count} listeners"
+  js:
+    streamers:
+      title: "Live audio streams"
+      no_streams: "No one is streaming right now."
+      error_loading: "There was a problem loading the live streams."
+      last_updated: "Last updated %{time}"
+      listen: "Listen"
+      profile: "Profile"
+      chat: "Open chat"
+      listeners:
+        one: "%{count} listener"
+        other: "%{count} listeners"

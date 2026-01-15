@@ -1,71 +1,87 @@
-<div class="streamers-page">
-  <h1>{{i18n "streamers.title"}}</h1>
+<section class="streamers-page">
+  <header class="streamers-header">
+    <h1>{{i18n "streamers.title"}}</h1>
+  </header>
 
   {{#if this.model.error}}
-    <p class="streamers-error">
+    <div class="streamers-error">
       {{i18n "streamers.error_loading"}}
-    </p>
-  {{/if}}
+    </div>
+  {{else if this.model.live_streams}}
+    {{#if this.model.live_streams.length}}
+      <ul class="streamers-list">
+        {{#each this.model.live_streams as |stream|}}
+          <li class="streamers-item">
+            <div class="streamer-main">
+              <div class="streamer-name">
+                {{#if stream.display_name}}
+                  {{stream.display_name}}
+                {{else}}
+                  {{stream.username}}
+                {{/if}}
+                {{#if stream.username}}
+                  <span class="streamer-username">@{{stream.username}}</span>
+                {{/if}}
+              </div>
 
-  {{#if this.model.live_streams}}
-    <ul class="streamers-list">
-      {{#each this.model.live_streams as |stream|}}
-        <li class="streamers-item">
-          <div class="streamers-main">
-            <span class="streamers-name">
-              {{stream.display_name}}
-            </span>
+              {{#if stream.listeners}}
+                <div class="streamer-listeners">
+                  {{i18n "streamers.listeners" count=stream.listeners}}
+                </div>
+              {{/if}}
+            </div>
 
-            <span class="streamers-listeners">
-              {{i18n "streamers.listeners" count=stream.listeners}}
-            </span>
-          </div>
+            <div class="streamer-actions">
+              {{#if stream.listen_url}}
+                <a
+                  class="btn btn-primary"
+                  href={{stream.listen_url}}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{i18n "streamers.listen"}}
+                </a>
+              {{/if}}
 
-          <div class="streamers-meta">
-            {{#if stream.topic_url}}
-              <a
-                class="streamers-link streamers-link--chat"
-                href={{stream.topic_url}}
-              >
-                {{i18n "streamers.chat"}}
-              </a>
-            {{/if}}
+              {{#if stream.chat_url}}
+                <a
+                  class="btn btn-secondary"
+                  href={{stream.chat_url}}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{i18n "streamers.chat"}}
+                </a>
+              {{/if}}
 
-            {{#if stream.profile_url}}
-              <a
-                class="streamers-link streamers-link--profile"
-                href={{stream.profile_url}}
-              >
-                {{i18n "streamers.profile"}}
-              </a>
-            {{/if}}
+              {{#if stream.profile_url}}
+                <a
+                  class="btn btn-link"
+                  href={{stream.profile_url}}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{i18n "streamers.profile"}}
+                </a>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
 
-            {{#if stream.stream_url}}
-              <a
-                class="streamers-link streamers-link--listen"
-                href={{stream.stream_url}}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{i18n "streamers.listen"}}
-              </a>
-            {{/if}}
-          </div>
-        </li>
-      {{/each}}
-    </ul>
+      {{#if this.model.updated_at}}
+        <div class="streamers-updated">
+          {{i18n "streamers.last_updated" time=this.model.updated_at}}
+        </div>
+      {{/if}}
+    {{else}}
+      <p class="streamers-empty">
+        {{i18n "streamers.no_streams"}}
+      </p>
+    {{/if}}
   {{else}}
     <p class="streamers-empty">
       {{i18n "streamers.no_streams"}}
     </p>
   {{/if}}
-
-  {{#if this.model.updated_at}}
-    <p class="streamers-updated">
-      {{i18n
-        "streamers.last_updated"
-        time=(format-date this.model.updated_at format="tiny")
-      }}
-    </p>
-  {{/if}}
-</div>
+</section>
