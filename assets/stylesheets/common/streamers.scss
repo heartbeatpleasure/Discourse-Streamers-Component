@@ -1,67 +1,68 @@
-.streamers-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5em 1em 3em;
+.hbp-streamers-page {
+  padding: 1.5em 0;
 
-  .streamers-header {
+  .hbp-streamers-title {
     margin-bottom: 1em;
-
-    h1 {
-      font-size: 1.8em;
-      margin: 0 0 0.5em;
-    }
   }
 
-  .streamers-list {
+  .hbp-streamers-list {
     list-style: none;
-    margin: 0;
+    margin: 0 0 1.5em 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75em;
   }
 
-  .streamer-card {
-    padding: 0.75em 1em;
-    border-radius: 0.5em;
-    background: var(--secondary-very-low);
+  .hbp-streamers-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.25em;
+    align-items: flex-start;
+    padding: 1em 0;
+    border-bottom: 1px solid var(--primary-200);
   }
 
-  .streamer-main {
+  .hbp-streamers-avatar {
+    margin-right: 1em;
+  }
+
+  .hbp-streamers-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hbp-streamers-header {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    align-items: baseline;
     gap: 0.5em;
-
-    .streamer-username {
-      font-weight: bold;
-    }
-
-    .streamer-mount {
-      font-size: 0.9em;
-      opacity: 0.8;
-    }
+    margin-bottom: 0.25em;
   }
 
-  .streamer-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75em;
+  .hbp-streamers-name {
+    font-weight: 600;
+  }
+
+  .hbp-streamers-username {
     font-size: 0.9em;
-    opacity: 0.9;
-
-    .streamer-listeners {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25em;
-    }
+    color: var(--primary-500);
   }
 
-  .streamers-empty {
-    margin-top: 1em;
-    opacity: 0.8;
+  .hbp-streamers-track {
+    font-size: 0.95em;
+    margin-bottom: 0.25em;
+  }
+
+  .hbp-streamers-meta {
+    font-size: 0.85em;
+    color: var(--primary-500);
+  }
+
+  .hbp-streamers-separator {
+    margin: 0 0.35em;
+  }
+
+  .hbp-streamers-empty {
+    margin-bottom: 1.5em;
+  }
+
+  .hbp-streamers-updated {
+    font-size: 0.8em;
+    color: var(--primary-500);
   }
 }
