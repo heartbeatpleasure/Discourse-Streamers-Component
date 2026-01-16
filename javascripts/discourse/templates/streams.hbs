@@ -4,41 +4,43 @@
   </h1>
 
   {{#if model.live_streams}}
-    <section class="hbp-streamers-grid">
+    <div class="hbp-streamers-grid">
       {{#each model.live_streams as |stream|}}
         <article class="hbp-streamer-card">
-          <div class="hbp-streamer-avatar">
-            {{avatar stream imageSize="huge"}}
+          <div class="hbp-streamer-card__header">
+            <div class="hbp-streamer-card__avatar">
+              {{avatar stream imageSize="huge"}}
+            </div>
+
+            <div class="hbp-streamer-card__identity">
+              <a
+                href={{concat "/u/" stream.username}}
+                class="hbp-streamer-card__name"
+              >
+                {{or stream.name stream.username}}
+              </a>
+
+              {{!-- Optionele user title zoals "Admin" als we die later in de JSON stoppen --}}
+              {{#if stream.user_title}}
+                <div class="hbp-streamer-card__title">
+                  {{stream.user_title}}
+                </div>
+              {{/if}}
+            </div>
           </div>
 
-          <div class="hbp-streamer-content">
-            <header class="hbp-streamer-header">
-              <div class="hbp-streamer-name-row">
-                {{#link-to "user" stream.username class="hbp-streamer-name-link"}}
-                  <span class="hbp-streamer-name">{{stream.name}}</span>
-                {{/link-to}}
-              </div>
+          <div class="hbp-streamer-card__meta">
+            <span>
+              {{i18n "streamers.listeners" count=stream.listeners}}
+            </span>
 
-              <span class="hbp-streamer-live-pill">
-                LIVE
-              </span>
-            </header>
-
-            <div class="hbp-streamer-meta">
-              <span class="hbp-streamer-meta-item">
-                {{i18n "streamers.listeners" count=stream.listeners}}
-              </span>
-
-              <span class="hbp-streamer-dot">•</span>
-
-              <span class="hbp-streamer-meta-item">
-                {{stream.bitrate}} kbps
-              </span>
-            </div>
+            {{#if stream.bitrate}}
+              <span>• {{stream.bitrate}} kbps</span>
+            {{/if}}
           </div>
         </article>
       {{/each}}
-    </section>
+    </div>
   {{else}}
     <p class="hbp-streamers-empty">
       {{i18n "streamers.no_streams"}}
