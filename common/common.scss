@@ -1,116 +1,130 @@
-.streamers-page {
-  max-width: 1200px;
+// ===== Streamers list layout =====
+
+.hbp-streamers {
+  max-width: 960px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 3rem;
+  padding: 1.5rem 0 2.5rem;
+}
 
-  .streamers-title {
-    font-size: 2.4rem;
-    font-weight: 700;
-    margin: 0 0 1.5rem 0;
-    color: var(--primary-high);
-    border-bottom: 1px solid var(--primary-low);
-    padding-bottom: 0.5rem;
+.hbp-streamers .streamers-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+// lijst zelf
+.hbp-streamers .streamers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// individuele “kaart”
+.hbp-streamers .streamer-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  background: var(--primary-very-low);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  align-items: flex-start;
+}
+
+// avatar + badge
+.hbp-streamers .streamer-avatar-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.hbp-streamers .streamer-avatar-wrapper .avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+.hbp-streamers .streamer-live-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--danger);
+  color: var(--secondary-very-high);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+// rechterkant van de kaart
+.hbp-streamers .streamer-main {
+  flex: 1 1 auto;
+}
+
+.hbp-streamers .streamer-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.hbp-streamers .streamer-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.hbp-streamers .streamer-username {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.hbp-streamers .streamer-track {
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+  opacity: 0.9;
+}
+
+.hbp-streamers .streamer-meta {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.hbp-streamers .streamer-meta-item {
+  display: inline-block;
+}
+
+.hbp-streamers .streamer-dot {
+  margin: 0 0.3rem;
+}
+
+// “last updated”
+.hbp-streamers .streamers-updated {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-top: 1.5rem;
+}
+
+// lege staat
+.hbp-streamers .streamers-empty {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+// Responsief: iets compacter op mobiel
+@media screen and (max-width: 600px) {
+  .hbp-streamers .streamer-card {
+    padding: 1rem 1.1rem;
   }
 
-  .streamers-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .streamer-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1.25rem 1.5rem;
-    border-radius: 1.25rem;
-    background: var(--secondary);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
-  }
-
-  .streamer-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .streamer-avatar {
-    flex: 0 0 auto;
-
-    .avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 999px;
-    }
-  }
-
-  .streamer-user {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .streamer-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-  }
-
-  .streamer-username {
-    font-size: 0.95rem;
-    color: var(--primary-medium);
-  }
-
-  .streamer-status {
-    margin-top: 0.25rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--success);
-  }
-
-  .streamer-meta {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    color: var(--primary-medium);
-
-    .streamer-separator {
-      margin: 0 0.35rem;
-    }
-  }
-
-  .streamer-audio-wrapper {
-    margin-top: 0.75rem;
-  }
-
-  .streamer-audio {
-    width: 100%;
-  }
-
-  .streamers-empty {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: var(--primary-medium);
-  }
-
-  .streamers-updated {
-    margin-top: 2rem;
-    font-size: 0.9rem;
-    color: var(--primary-medium);
-  }
-
-  @media (min-width: 700px) {
-    .streamer-card {
-      padding: 1.5rem 1.75rem;
-    }
-
-    .streamer-header {
-      gap: 1.25rem;
-    }
-
-    .streamer-avatar .avatar {
-      width: 80px;
-      height: 80px;
-    }
+  .hbp-streamers .streamer-avatar-wrapper .avatar {
+    width: 60px;
+    height: 60px;
   }
 }
