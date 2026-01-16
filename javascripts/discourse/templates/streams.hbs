@@ -1,46 +1,64 @@
-{{!-- assets/javascripts/discourse/templates/streams.hbs --}}
-<div class="streamers-page">
-  <h1 class="streamers-title">
-    {{i18n "streamers.title"}}
-  </h1>
+<div class="hb-streams-page">
+  <header class="hb-streams-header">
+    <h1 class="hb-streams-title">{{i18n "streamers.title"}}</h1>
+    <div class="hb-streams-title-underline"></div>
+  </header>
 
   {{#if this.model.live_streams}}
-    <div class="streamers-list">
+    <section class="hb-streams-list">
       {{#each this.model.live_streams as |stream|}}
-        <article class="stream-card">
-          <div class="stream-card-avatar">
-            {{avatar stream username=stream.username size="huge"}}
-          </div>
-
-          <div class="stream-card-body">
-            <div class="stream-card-header">
-              <div class="stream-card-name">
-                {{stream.name}}
-              </div>
-              <span class="stream-card-status">LIVE</span>
+        <article class="hb-stream-card">
+          <div class="hb-stream-card-inner">
+            <div class="hb-stream-avatar">
+              {{avatar stream imageSize="huge"}}
             </div>
 
-            <div class="stream-card-meta">
-              <span class="stream-card-listeners">
-                {{stream.listeners}}
-                {{i18n "streamers.listeners" count=stream.listeners}}
-              </span>
-              <span class="stream-card-dot">•</span>
-              <span class="stream-card-bitrate">
-                {{stream.bitrate}} kbps
-              </span>
+            <div class="hb-stream-content">
+              <div class="hb-stream-header-row">
+                <a
+                  href="/u/{{stream.username}}"
+                  class="hb-stream-name"
+                >
+                  {{stream.name}}
+                </a>
+
+                <span class="hb-stream-live-pill">
+                  LIVE
+                </span>
+              </div>
+
+              <div class="hb-stream-meta-row">
+                <span class="hb-stream-listeners">
+                  {{i18n "streamers.listeners" count=stream.listeners}}
+                </span>
+                <span class="hb-stream-bullet">•</span>
+                <span class="hb-stream-bitrate">
+                  {{stream.bitrate}} kbps
+                </span>
+              </div>
+
+              <div class="hb-stream-actions-row">
+                <a
+                  class="hb-stream-listen-button"
+                  href="https://stream.heartbeatpleasure.com/radio{{stream.mount}}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{i18n "streamers.listen"}}
+                </a>
+              </div>
             </div>
           </div>
         </article>
       {{/each}}
-    </div>
+    </section>
   {{else}}
-    <p class="streamers-empty">
+    <p class="hb-streams-empty">
       {{i18n "streamers.no_streams"}}
     </p>
   {{/if}}
 
-  <div class="streamers-updated">
+  <p class="hb-streams-updated">
     {{i18n "streamers.last_updated" time=this.model.updated_at}}
-  </div>
+  </p>
 </div>
