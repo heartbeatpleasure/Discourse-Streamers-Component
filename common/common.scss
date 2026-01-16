@@ -1,106 +1,116 @@
-.hbp-streamers-title {
-  color: #ff00ff !important;
-  border-bottom: 3px solid #ff00ff;
-}
-
-
-
-.hbp-streamers-page {
-  max-width: 1100px;
+.streamers-page {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 3rem;
-}
+  padding: 2rem 1.5rem 3rem;
 
-.hbp-streamers-title {
-  font-size: 2.25rem;
-  font-weight: 700;
-  margin: 0 0 1.75rem;
-}
-
-.hbp-streamers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.hbp-streamer-card {
-  background: var(--primary-very-low); // zelfde soort kaart-achtergrond als user cards
-  border-radius: 1rem;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
-  display: flex;
-  flex-direction: column;
-}
-
-.hbp-streamer-card__header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.hbp-streamer-card__avatar .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
-
-.hbp-streamer-card__identity {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.hbp-streamer-card__name {
-  font-size: 1.4rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.hbp-streamer-card__title {
-  margin-top: 0.15rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  opacity: 0.85;
-}
-
-.hbp-streamer-card__meta {
-  margin-top: 0.9rem;
-  font-size: 0.95rem;
-  opacity: 0.85;
-}
-
-.hbp-streamer-card__meta span + span {
-  margin-left: 0.4rem;
-}
-
-.hbp-streamers-empty {
-  font-size: 1.05rem;
-  opacity: 0.8;
-}
-
-.hbp-streamers-updated {
-  margin-top: 2rem;
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
-
-/* Mobile tweaks */
-@media (max-width: 600px) {
-  .hbp-streamers-page {
-    padding-inline: 1rem;
+  .streamers-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    color: var(--primary-high);
+    border-bottom: 1px solid var(--primary-low);
+    padding-bottom: 0.5rem;
   }
 
-  .hbp-streamer-card {
-    padding: 1rem 1.1rem;
+  .streamers-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
-  .hbp-streamer-card__avatar .avatar {
-    width: 64px;
-    height: 64px;
+  .streamer-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--secondary);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
   }
 
-  .hbp-streamers-title {
-    font-size: 2rem;
+  .streamer-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .streamer-avatar {
+    flex: 0 0 auto;
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+    }
+  }
+
+  .streamer-user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .streamer-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .streamer-username {
+    font-size: 0.95rem;
+    color: var(--primary-medium);
+  }
+
+  .streamer-status {
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--success);
+  }
+
+  .streamer-meta {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--primary-medium);
+
+    .streamer-separator {
+      margin: 0 0.35rem;
+    }
+  }
+
+  .streamer-audio-wrapper {
+    margin-top: 0.75rem;
+  }
+
+  .streamer-audio {
+    width: 100%;
+  }
+
+  .streamers-empty {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: var(--primary-medium);
+  }
+
+  .streamers-updated {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--primary-medium);
+  }
+
+  @media (min-width: 700px) {
+    .streamer-card {
+      padding: 1.5rem 1.75rem;
+    }
+
+    .streamer-header {
+      gap: 1.25rem;
+    }
+
+    .streamer-avatar .avatar {
+      width: 80px;
+      height: 80px;
+    }
   }
 }
- 
