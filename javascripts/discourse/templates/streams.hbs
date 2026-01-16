@@ -1,48 +1,37 @@
+{{!-- assets/javascripts/discourse/templates/streams.hbs --}}
 <div class="streamers-page">
   <h1 class="streamers-title">
     {{i18n "streamers.title"}}
   </h1>
 
-  {{#if this.model.live_streams.length}}
+  {{#if this.model.live_streams}}
     <div class="streamers-list">
       {{#each this.model.live_streams as |stream|}}
-        <div class="streamer-card">
-          <div class="streamer-avatar">
-            {{avatar stream username=stream.username size="large"}}
+        <article class="stream-card">
+          <div class="stream-card-avatar">
+            {{avatar stream username=stream.username size="huge"}}
           </div>
 
-          <div class="streamer-info">
-            <div class="streamer-header">
-              <a
-                class="streamer-name"
-                href={{user-path stream.username}}
-              >
+          <div class="stream-card-body">
+            <div class="stream-card-header">
+              <div class="stream-card-name">
                 {{stream.name}}
-              </a>
-              <span class="streamer-live-pill">
-                LIVE
+              </div>
+              <span class="stream-card-status">LIVE</span>
+            </div>
+
+            <div class="stream-card-meta">
+              <span class="stream-card-listeners">
+                {{stream.listeners}}
+                {{i18n "streamers.listeners" count=stream.listeners}}
+              </span>
+              <span class="stream-card-dot">•</span>
+              <span class="stream-card-bitrate">
+                {{stream.bitrate}} kbps
               </span>
             </div>
-
-            <div class="streamer-meta">
-              {{i18n "streamers.listeners" count=stream.listeners}}
-              •
-              {{stream.bitrate}} kbps
-            </div>
-
-            {{!-- AUDIO PLAYER --}}
-            {{#if stream.listen_url}}
-              <audio
-                class="streamer-audio"
-                controls
-                preload="none"
-                src={{stream.listen_url}}
-              >
-                {{i18n "streamers.listen"}}
-              </audio>
-            {{/if}}
           </div>
-        </div>
+        </article>
       {{/each}}
     </div>
   {{else}}
@@ -51,9 +40,7 @@
     </p>
   {{/if}}
 
-  {{#if this.model.updated_at}}
-    <div class="streamers-updated">
-      {{i18n "streamers.last_updated" time=this.model.updated_at}}
-    </div>
-  {{/if}}
+  <div class="streamers-updated">
+    {{i18n "streamers.last_updated" time=this.model.updated_at}}
+  </div>
 </div>
