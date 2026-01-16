@@ -1,52 +1,59 @@
-<section class="hbp-streamers">
+<div class="streamers-page">
   <h1 class="streamers-title">
     {{i18n "streamers.title"}}
   </h1>
 
-  {{#if model.live_streams}}
-    <ul class="streamers-list">
-      {{#each model.live_streams as |stream|}}
-        <li class="streamer-card">
-          <div class="streamer-avatar-wrapper">
-            {{avatar stream imageSize="large" usernamePath="username"}}
-            <span class="streamer-live-badge">LIVE</span>
+  {{#if this.model.live_streams.length}}
+    <div class="streamers-list">
+      {{#each this.model.live_streams as |stream|}}
+        <div class="streamer-card">
+          <div class="streamer-avatar">
+            {{avatar stream username=stream.username size="large"}}
           </div>
 
-          <div class="streamer-main">
+          <div class="streamer-info">
             <div class="streamer-header">
-              {{#link-to "user" stream.username class="streamer-name"}}
+              <a
+                class="streamer-name"
+                href={{user-path stream.username}}
+              >
                 {{stream.name}}
-              {{/link-to}}
-              <span class="streamer-username">@{{stream.username}}</span>
+              </a>
+              <span class="streamer-live-pill">
+                LIVE
+              </span>
             </div>
-
-            {{!-- Titel van het nummer is optioneel, maar vaak wel leuk --}}
-            {{#if stream.title}}
-              <div class="streamer-track">
-                {{stream.title}}
-              </div>
-            {{/if}}
 
             <div class="streamer-meta">
-              <span class="streamer-meta-item">
-                {{i18n "streamers.listeners" count=stream.listeners}}
-              </span>
-              <span class="streamer-dot">•</span>
-              <span class="streamer-meta-item">
-                {{stream.bitrate}} kbps
-              </span>
+              {{i18n "streamers.listeners" count=stream.listeners}}
+              •
+              {{stream.bitrate}} kbps
             </div>
-          </div>
-        </li>
-      {{/each}}
-    </ul>
 
-    <p class="streamers-updated">
-      {{i18n "streamers.last_updated" time=model.updated_at}}
-    </p>
+            {{!-- AUDIO PLAYER --}}
+            {{#if stream.listen_url}}
+              <audio
+                class="streamer-audio"
+                controls
+                preload="none"
+                src={{stream.listen_url}}
+              >
+                {{i18n "streamers.listen"}}
+              </audio>
+            {{/if}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
   {{else}}
     <p class="streamers-empty">
       {{i18n "streamers.no_streams"}}
     </p>
   {{/if}}
-</section>
+
+  {{#if this.model.updated_at}}
+    <div class="streamers-updated">
+      {{i18n "streamers.last_updated" time=this.model.updated_at}}
+    </div>
+  {{/if}}
+</div>
