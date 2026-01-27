@@ -272,86 +272,70 @@
 
 // --- Mini player ------------------------------------------------------------
 
-.hb-streamers-player {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  width: 420px;
-  max-width: calc(100vw - 32px);
-  z-index: 1002;
+// --- Header player ----------------------------------------------------------
 
+.hb-streamers-header-item {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+}
 
-  padding: 0.75rem 0.9rem;
-  border-radius: 18px;
+.hb-streamers-header-player {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
 
   background: var(--secondary);
   border: 1px solid var(--primary-low);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
 
-.hb-streamers-player-main {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.hb-streamers-player-title {
-  display: flex;
+.hb-streamers-header-left {
+  display: inline-flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: 0.4rem;
   min-width: 0;
 }
 
-.hb-streamers-player-name {
-  font-weight: 900;
+.hb-streamers-header-name {
+  font-weight: 800;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.hb-streamers-player-status {
+.hb-streamers-header-status {
   font-size: 0.85rem;
   opacity: 0.75;
   white-space: nowrap;
 }
 
-.hb-streamers-player-subtitle {
-  font-size: 0.95rem;
-  opacity: 0.8;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.hb-streamers-player-error {
-  margin-top: 0.15rem;
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-.hb-streamers-player-controls {
-  display: flex;
-  gap: 0.35rem;
+.hb-streamers-header-controls {
+  display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 0.15rem;
 }
 
-.hb-streamers-player-controls .btn {
+.hb-streamers-header-btn.btn {
+  padding: 0.25rem 0.35rem;
   border-radius: 999px;
-  font-weight: 800;
 }
 
-.hb-streamers-player-volume {
-  width: 90px;
+.hb-streamers-header-volume {
+  width: 80px;
+  margin-left: 0.25rem;
 }
 
-@media (max-width: 640px) {
-  .hb-streamers-player {
-    left: 16px;
-    right: 16px;
-    width: auto;
+/* Tablet/mobiel: maak 'm compact */
+@media (max-width: 700px) {
+  .hb-streamers-header-name,
+  .hb-streamers-header-status {
+    display: none;
+  }
+
+  .hb-streamers-header-volume {
+    display: none;
   }
 }

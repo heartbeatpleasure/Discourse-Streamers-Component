@@ -33,13 +33,6 @@ export default class StreamersPlayerBar extends Component {
   }
 
   @action
-  openExternal() {
-    const url = this.stream?.listen_url;
-    if (!url) return;
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-
-  @action
   setVolume(e) {
     this.streamersPlayer.setVolume(e?.target?.value);
   }
