@@ -1,7 +1,7 @@
 {{!-- assets/javascripts/discourse/components/streamers-player-bar.hbs --}}
 
 {{#if this.canShow}}
-  <div class="hb-streamers-header-player" role="region" aria-label="Stream player">
+  <div class="hb-streamers-header-player" role="region" aria-label="Livestream player">
     <div class="hb-streamers-header-left">
       <span class="hb-streamers-header-name">
         {{or this.stream.name this.stream.username}}
@@ -20,55 +20,14 @@
       </span>
     </div>
 
-    <div class="hb-streamers-header-controls">
-      <button
-        type="button"
-        class="btn btn-icon hb-streamers-header-btn"
-        {{on "click" this.togglePlayPause}}
-        title={{if this.streamersPlayer.isPlaying (i18n "hb_streamers.pause") (if this.streamersPlayer.isPaused (i18n "hb_streamers.resume") (i18n "hb_streamers.play"))}}
-        aria-label={{if this.streamersPlayer.isPlaying (i18n "hb_streamers.pause") (if this.streamersPlayer.isPaused (i18n "hb_streamers.resume") (i18n "hb_streamers.play"))}}
-      >
-        {{#if this.streamersPlayer.isPlaying}}
-          {{d-icon "pause"}}
-        {{else}}
-          {{d-icon "play"}}
-        {{/if}}
-      </button>
-
-      <button
-        type="button"
-        class="btn btn-icon hb-streamers-header-btn"
-        {{on "click" this.stop}}
-        title={{i18n "hb_streamers.stop"}}
-        aria-label={{i18n "hb_streamers.stop"}}
-      >
-        {{d-icon "stop"}}
-      </button>
-
-      <button
-        type="button"
-        class="btn btn-icon hb-streamers-header-btn"
-        {{on "click" this.toggleMute}}
-        title={{if this.streamersPlayer.muted (i18n "hb_streamers.unmute") (i18n "hb_streamers.mute")}}
-        aria-label={{if this.streamersPlayer.muted (i18n "hb_streamers.unmute") (i18n "hb_streamers.mute")}}
-      >
-        {{#if this.streamersPlayer.muted}}
-          {{d-icon "volume-mute"}}
-        {{else}}
-          {{d-icon "volume-up"}}
-        {{/if}}
-      </button>
-
-      <input
-        class="hb-streamers-header-volume"
-        type="range"
-        min="0"
-        max="1"
-        step="0.05"
-        value={{this.streamersPlayer.volume}}
-        {{on "input" this.setVolume}}
-        aria-label="Volume"
-      />
-    </div>
+    <button
+      type="button"
+      class="btn btn-icon hb-streamers-header-toggle"
+      {{on "click" this.togglePlayPause}}
+      title={{i18n this.toggleLabel}}
+      aria-label={{i18n this.toggleLabel}}
+    >
+      {{d-icon this.toggleIcon}}
+    </button>
   </div>
 {{/if}}

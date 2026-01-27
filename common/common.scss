@@ -274,15 +274,20 @@
 
 // --- Header player ----------------------------------------------------------
 
+// --- Header player ----------------------------------------------------------
+
 .hb-streamers-header-item {
   display: flex;
   align-items: center;
+  margin-left: 8px; // extra ruimte t.o.v. user avatar cluster
+  padding-left: 10px;
+  border-left: 1px solid var(--primary-low); // Optie A divider
 }
 
 .hb-streamers-header-player {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
 
   padding: 0.35rem 0.55rem;
   border-radius: 999px;
@@ -300,7 +305,7 @@
 
 .hb-streamers-header-name {
   font-weight: 800;
-  max-width: 140px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -312,30 +317,19 @@
   white-space: nowrap;
 }
 
-.hb-streamers-header-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-}
-
-.hb-streamers-header-btn.btn {
-  padding: 0.25rem 0.35rem;
+.hb-streamers-header-toggle.btn {
+  padding: 0.25rem 0.45rem;
   border-radius: 999px;
 }
 
-.hb-streamers-header-volume {
-  width: 80px;
-  margin-left: 0.25rem;
-}
-
-/* Tablet/mobiel: maak 'm compact */
+/* Mobiel: super compact, geen tekst, alleen de toggle knop */
 @media (max-width: 700px) {
-  .hb-streamers-header-name,
-  .hb-streamers-header-status {
-    display: none;
+  .hb-streamers-header-item {
+    margin-left: 6px;
+    padding-left: 8px;
   }
 
-  .hb-streamers-header-volume {
+  .hb-streamers-header-left {
     display: none;
   }
 }

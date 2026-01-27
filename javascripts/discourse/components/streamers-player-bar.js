@@ -14,31 +14,31 @@ export default class StreamersPlayerBar extends Component {
     return this.streamersPlayer.isVisible;
   }
 
+  get toggleLabel() {
+    if (this.streamersPlayer.isPlaying) return "hb_streamers.pause";
+    if (this.streamersPlayer.isPaused) return "hb_streamers.play";
+    if (this.streamersPlayer.isLoading) return "hb_streamers.loading";
+    if (this.streamersPlayer.errorMessage) return "hb_streamers.play";
+    return "hb_streamers.play";
+  }
+
+  get toggleIcon() {
+    // 1 knop die togglet: playing => pause icon, anders play icon
+    return this.streamersPlayer.isPlaying ? "pause" : "play";
+  }
+
   @action
   togglePlayPause() {
-    if (!this.stream) return;
+    const stream = this.stream;
+    if (!stream) return;
 
     if (this.streamersPlayer.isPlaying) {
       this.streamersPlayer.pause();
     } else if (this.streamersPlayer.isPaused) {
       this.streamersPlayer.resume();
     } else {
-      this.streamersPlayer.playOrToggle(this.stream);
+      // stopped/loading/error -> probeer af te spelen
+      this.streamersPlayer.playOrToggle(stream);
     }
-  }
-
-  @action
-  stop() {
-    this.streamersPlayer.stop();
-  }
-
-  @action
-  setVolume(e) {
-    this.streamersPlayer.setVolume(e?.target?.value);
-  }
-
-  @action
-  toggleMute() {
-    this.streamersPlayer.toggleMute();
   }
 }
