@@ -431,3 +431,15 @@
     min-width: 220px;
   }
 }
+
+@media (max-width: 700px) {
+  /* Verberg volume slider op mobiel */
+  .hb-streamers-header-menu-row {
+    display: none;
+  }
+
+  /* Zorg dat de knoppen direct bovenaan komen */
+  .hb-streamers-header-menu-actions {
+    margin-top: 0;
+  }
+}
