@@ -51,6 +51,11 @@ export default class StreamersPlayerBar extends Component {
   }
 
   @action
+  closeMenu() {
+    this.menuOpen = false;
+  }
+
+  @action
   stop() {
     this.menuOpen = false;
     this.streamersPlayer.stop();

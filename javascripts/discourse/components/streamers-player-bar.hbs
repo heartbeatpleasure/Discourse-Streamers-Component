@@ -1,82 +1,87 @@
 {{!-- assets/javascripts/discourse/components/streamers-player-bar.hbs --}}
 
 {{#if this.canShow}}
-  <div class="hb-streamers-header-player" role="region" aria-label="Livestream player">
-    <div class="hb-streamers-header-left">
-      <span class="hb-streamers-header-name">
-        {{or this.stream.name this.stream.username}}
-      </span>
+  <li class="hb-streamers-header-item">
+    <div class="hb-streamers-header-player" role="region" aria-label="Livestream player">
+      <div class="hb-streamers-header-left">
+        <span class="hb-streamers-header-name">
+          {{or this.stream.name this.stream.username}}
+        </span>
 
-      <span class="hb-streamers-header-status">
-        {{#if this.streamersPlayer.isLoading}}
-          {{i18n "hb_streamers.loading"}}
-        {{else if this.streamersPlayer.isPlaying}}
-          {{i18n "hb_streamers.playing"}}
-        {{else if this.streamersPlayer.isPaused}}
-          {{i18n "hb_streamers.paused"}}
-        {{else if this.streamersPlayer.errorMessage}}
-          {{i18n "hb_streamers.error"}}
-        {{/if}}
-      </span>
-    </div>
-
-    <button
-      type="button"
-      class="hb-streamers-header-iconbtn hb-streamers-header-toggle"
-      {{on "click" this.togglePlayPause}}
-      title={{i18n this.toggleLabelKey}}
-      aria-label={{i18n this.toggleLabelKey}}
-    >
-      {{d-icon this.toggleIcon}}
-    </button>
-
-    <button
-      type="button"
-      class="hb-streamers-header-iconbtn hb-streamers-header-menubtn"
-      {{on "click" this.toggleMenu}}
-      title={{i18n "hb_streamers.options"}}
-      aria-label={{i18n "hb_streamers.options"}}
-    >
-      <span class="hb-streamers-header-dots" aria-hidden="true">⋯</span>
-    </button>
-
-    {{#if this.menuOpen}}
-      <div class="hb-streamers-header-menu" role="dialog" aria-label="Player options">
-        <div class="hb-streamers-header-menu-row">
-          <span class="hb-streamers-header-menu-label">
-            {{i18n "hb_streamers.volume"}}
-          </span>
-
-          <input
-            class="hb-streamers-header-volume"
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value={{this.streamersPlayer.volume}}
-            {{on "input" this.setVolume}}
-            aria-label={{i18n "hb_streamers.volume"}}
-          />
-        </div>
-
-        <div class="hb-streamers-header-menu-actions">
-          <button
-            type="button"
-            class="hb-streamers-header-actionbtn"
-            {{on "click" this.toggleMute}}
-          >
-            {{i18n this.muteLabelKey}}
-          </button>
-
-          <button
-            type="button"
-            class="hb-streamers-header-actionbtn hb-streamers-header-stopbtn"
-            {{on "click" this.stop}}
-          >
-            {{i18n "hb_streamers.stop"}}
-          </button>
-        </div>
+        <span class="hb-streamers-header-status">
+          {{#if this.streamersPlayer.isLoading}}
+            {{i18n "hb_streamers.loading"}}
+          {{else if this.streamersPlayer.isPlaying}}
+            {{i18n "hb_streamers.playing"}}
+          {{else if this.streamersPlayer.isPaused}}
+            {{i18n "hb_streamers.paused"}}
+          {{else if this.streamersPlayer.errorMessage}}
+            {{i18n "hb_streamers.error"}}
+          {{/if}}
+        </span>
       </div>
-    {{/if}}
-  </div>
+
+      <button
+        type="button"
+        class="hb-streamers-header-iconbtn hb-streamers-header-toggle"
+        {{on "click" this.togglePlayPause}}
+        title={{i18n this.toggleLabelKey}}
+        aria-label={{i18n this.toggleLabelKey}}
+      >
+        {{d-icon this.toggleIcon}}
+      </button>
+
+      <button
+        type="button"
+        class="hb-streamers-header-iconbtn hb-streamers-header-menubtn"
+        {{on "click" this.toggleMenu}}
+        title={{i18n "hb_streamers.options"}}
+        aria-label={{i18n "hb_streamers.options"}}
+      >
+        <span class="hb-streamers-header-dots" aria-hidden="true">⋯</span>
+      </button>
+
+      {{#if this.menuOpen}}
+        {{!-- Klik buiten het menu sluit het menu --}}
+        <div class="hb-streamers-header-backdrop" {{on "click" this.closeMenu}}></div>
+
+        <div class="hb-streamers-header-menu" role="dialog" aria-label="Player options">
+          <div class="hb-streamers-header-menu-row">
+            <span class="hb-streamers-header-menu-label">
+              {{i18n "hb_streamers.volume"}}
+            </span>
+
+            <input
+              class="hb-streamers-header-volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={{this.streamersPlayer.volume}}
+              {{on "input" this.setVolume}}
+              aria-label={{i18n "hb_streamers.volume"}}
+            />
+          </div>
+
+          <div class="hb-streamers-header-menu-actions">
+            <button
+              type="button"
+              class="hb-streamers-header-actionbtn"
+              {{on "click" this.toggleMute}}
+            >
+              {{i18n this.muteLabelKey}}
+            </button>
+
+            <button
+              type="button"
+              class="hb-streamers-header-actionbtn hb-streamers-header-stopbtn"
+              {{on "click" this.stop}}
+            >
+              {{i18n "hb_streamers.stop"}}
+            </button>
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </li>
 {{/if}}

@@ -9,9 +9,7 @@ export default apiInitializer("1.0", (api) => {
   api.headerIcons.add(
     "hb-streamers-player",
     <template>
-      <li class="hb-streamers-header-item">
-        <StreamersPlayerBar />
-      </li>
+      <StreamersPlayerBar />
     </template>,
     { after: "search" }
   );

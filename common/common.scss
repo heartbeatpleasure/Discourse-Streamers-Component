@@ -345,6 +345,14 @@
   opacity: 0.9;
 }
 
+/* Backdrop: klik buiten menu sluit het menu */
+.hb-streamers-header-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1999;
+  background: transparent;
+}
+
 /* Dropdown menu */
 .hb-streamers-header-menu {
   position: absolute;
@@ -396,10 +404,6 @@
 
 .hb-streamers-header-actionbtn:hover {
   background: var(--primary-low-mid, var(--primary-low));
-}
-
-.hb-streamers-header-stopbtn {
-  /* optioneel: stop iets “sterker” laten voelen */
 }
 
 /* Mobiel: houd context (naam) zichtbaar, status weg */
