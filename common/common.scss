@@ -270,8 +270,6 @@
   margin-bottom: 0.4rem;
 }
 
-// --- Mini player ------------------------------------------------------------
-
 // --- Header player ----------------------------------------------------------
 
 // --- Header player ----------------------------------------------------------
@@ -279,17 +277,21 @@
 .hb-streamers-header-item {
   display: flex;
   align-items: center;
-  margin-left: 8px; // extra ruimte t.o.v. user avatar cluster
-  padding-left: 10px;
-  border-left: 1px solid var(--primary-low); // Optie A divider
+
+  /* Optie A: duidelijke scheiding t.o.v. user avatar cluster */
+  margin-left: 10px;
+  padding-left: 12px;
+  border-left: 2px solid var(--primary-low-mid, var(--primary-low));
+  opacity: 0.9;
 }
 
 .hb-streamers-header-player {
+  position: relative; /* voor dropdown */
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.25rem;
 
-  padding: 0.35rem 0.55rem;
+  padding: 0.28rem 0.4rem;
   border-radius: 999px;
 
   background: var(--secondary);
@@ -301,11 +303,12 @@
   align-items: baseline;
   gap: 0.4rem;
   min-width: 0;
+  padding: 0 0.25rem;
 }
 
 .hb-streamers-header-name {
   font-weight: 800;
-  max-width: 160px;
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -313,23 +316,99 @@
 
 .hb-streamers-header-status {
   font-size: 0.85rem;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+.hb-streamers-header-iconbtn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.2rem 0.35rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.hb-streamers-header-iconbtn:hover {
+  background: var(--primary-low);
+}
+
+.hb-streamers-header-iconbtn .d-icon {
+  width: 0.95em;
+  height: 0.95em;
+}
+
+/* Dropdown menu */
+.hb-streamers-header-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 2000;
+
+  min-width: 220px;
+  padding: 10px;
+  border-radius: 12px;
+
+  background: var(--secondary);
+  border: 1px solid var(--primary-low);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.hb-streamers-header-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hb-streamers-header-menu-label {
+  font-size: 0.9rem;
   opacity: 0.75;
   white-space: nowrap;
 }
 
-.hb-streamers-header-toggle.btn {
-  padding: 0.25rem 0.45rem;
-  border-radius: 999px;
+.hb-streamers-header-volume {
+  flex: 1 1 auto;
+  width: 120px;
 }
 
-/* Mobiel: super compact, geen tekst, alleen de toggle knop */
+.hb-streamers-header-stopbtn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid var(--primary-low);
+  background: var(--primary-low);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.hb-streamers-header-stopbtn:hover {
+  background: var(--primary-low-mid, var(--primary-low));
+}
+
+/* Mobiel: houd context (naam) zichtbaar, maar maak 't compacter */
 @media (max-width: 700px) {
   .hb-streamers-header-item {
-    margin-left: 6px;
-    padding-left: 8px;
+    margin-left: 8px;
+    padding-left: 10px;
+    border-left-width: 2px;
   }
 
-  .hb-streamers-header-left {
-    display: none;
+  .hb-streamers-header-player {
+    padding: 0.22rem 0.32rem;
+  }
+
+  .hb-streamers-header-name {
+    max-width: 92px;
+    font-size: 0.92rem;
+  }
+
+  .hb-streamers-header-status {
+    display: none; /* status weg, scheelt ruimte */
+  }
+
+  .hb-streamers-header-menu {
+    min-width: 200px;
   }
 }
