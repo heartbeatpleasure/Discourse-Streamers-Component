@@ -1,0 +1,84 @@
+{{!-- assets/javascripts/discourse/templates/streams.hbs --}}
+
+<div class="hb-streams-page">
+  <h1 class="hb-streams-title">
+    {{i18n "streamers.title"}}
+  </h1>
+
+  {{#if this.model.live_streams.length}}
+    <div class="hb-streams-list">
+      {{#each this.model.live_streams as |stream|}}
+        <article class="hb-stream-card">
+          <div class="hb-stream-avatar">
+            {{avatar
+              stream
+              usernamePath="username"
+              namePath="name"
+              avatarTemplatePath="avatar_template"
+              imageSize="huge"
+            }}
+          </div>
+
+          <div class="hb-stream-main">
+            <div class="hb-stream-user-row">
+              <span class="hb-stream-username">
+                {{or stream.name stream.username}}
+              </span>
+
+              <span class="hb-stream-live-pill">
+                {{i18n "streamers.live"}}
+              </span>
+
+              <button
+                class="btn btn-primary hb-stream-listen-btn"
+                type="button"
+                disabled
+                title="Player coming soon"
+              >
+                Listen
+              </button>
+            </div>
+
+            <div class="hb-stream-meta">
+              <span class="hb-stream-meta-item">
+                {{i18n "streamers.listeners" count=stream.listeners}}
+              </span>
+
+              {{#if stream.age}}
+                <span class="hb-stream-meta-sep">•</span>
+                <span class="hb-stream-meta-item">
+                  Age: {{stream.age}}
+                </span>
+              {{/if}}
+
+              {{#if stream.gender}}
+                <span class="hb-stream-meta-sep">•</span>
+                <span class="hb-stream-meta-item">
+                  {{stream.gender}}
+                </span>
+              {{/if}}
+            </div>
+          </div>
+        </article>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="hb-streams-empty">
+      {{i18n "streamers.no_streams"}}
+    </p>
+  {{/if}}
+
+  {{#if (and this.model.me this.model.me.allowed)}}
+    <section class="hb-stream-settings-wrapper">
+      <div class="hb-stream-settings-card">
+        {{streamer-settings streamSettings=this.model.me timezone=this.model.timezone}}
+      </div>
+    </section>
+  {{/if}}
+
+  {{#if this.model.updated_at}}
+    <p class="hb-streams-updated">
+      {{i18n "streamers.last_updated" time=(or this.model.formatted_updated_at this.model.updated_at)}}
+    </p>
+  {{/if}}
+</div>

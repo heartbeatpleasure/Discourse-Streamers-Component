@@ -1,0 +1,100 @@
+<section class="hb-stream-settings">
+  <div class="hb-stream-settings-card">
+    <h2 class="hb-stream-settings-heading">
+      {{i18n "streamers_settings.heading"}}
+    </h2>
+
+    <p class="hb-stream-settings-intro">
+      {{i18n "streamers_settings.intro"}}
+    </p>
+
+    {{#if this.loading}}
+      <p>{{i18n "loading"}}</p>
+    {{else if this.loadError}}
+      <p class="hb-stream-settings-error">
+        {{i18n "streamers_settings.load_error"}}
+      </p>
+    {{else}}
+      <div class="hb-stream-settings-section hb-stream-settings-status">
+        {{#if this.isEnabled}}
+          <span class="hb-stream-settings-status-pill hb-stream-settings-status-pill--ok">
+            ✓ {{i18n "streamers_settings.status_enabled"}}
+          </span>
+        {{else}}
+          <span class="hb-stream-settings-status-pill hb-stream-settings-status-pill--warning">
+            ! {{i18n "streamers_settings.status_disabled"}}
+          </span>
+        {{/if}}
+      </div>
+
+      <div class="hb-stream-settings-section">
+        <div class="hb-stream-settings-label">
+          {{i18n "streamers_settings.mount_label"}}
+        </div>
+        <div class="hb-stream-settings-row">
+          <code class="hb-stream-settings-mono">{{this.mount}}</code>
+          <DButton
+            @class="btn btn-small"
+            @label="streamers_settings.copy"
+            @action={{fn this.copy "mount"}}
+          />
+        </div>
+      </div>
+
+      <div class="hb-stream-settings-section">
+        <div class="hb-stream-settings-label">
+          {{i18n "streamers_settings.listen_url_label"}}
+        </div>
+        <div class="hb-stream-settings-row">
+          <code class="hb-stream-settings-mono">{{this.listenUrl}}</code>
+          <DButton
+            @class="btn btn-small"
+            @label="streamers_settings.copy"
+            @action={{fn this.copy "listenUrl"}}
+          />
+        </div>
+      </div>
+
+      <div class="hb-stream-settings-section">
+        <div class="hb-stream-settings-label">
+          {{i18n "streamers_settings.stream_key_label"}}
+        </div>
+
+        <p class="hb-stream-settings-help">
+          {{#if this.hasStreamKey}}
+            {{i18n "streamers_settings.stream_key_exists"}}
+          {{else}}
+            {{i18n "streamers_settings.stream_key_never"}}
+          {{/if}}
+        </p>
+
+        <DButton
+          @class="btn btn-small btn-primary"
+          @label="streamers_settings.rotate_key"
+          @action={{this.generateOrRotateKey}}
+          @disabled={{this.rotatingKey}}
+        />
+
+        <p class="hb-stream-settings-help">
+          {{i18n "streamers_settings.stream_key_notice"}}
+        </p>
+      </div>
+
+      <div class="hb-stream-settings-section">
+        <div class="hb-stream-settings-label">
+          {{i18n "streamers_settings.last_stream_label"}}
+        </div>
+        <p class="hb-stream-settings-help">
+          {{this.lastStreamText}}
+        </p>
+      </div>
+
+      <div class="hb-stream-settings-section hb-stream-settings-help-block">
+        <h3>{{i18n "streamers_settings.help_title"}}</h3>
+        <p>
+          {{{i18n "streamers_settings.help_text_html"}}}
+        </p>
+      </div>
+    {{/if}}
+  </div>
+</section>

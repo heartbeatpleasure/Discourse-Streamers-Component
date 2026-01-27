@@ -1,0 +1,271 @@
+// --- Streams page -----------------------------------------------------------
+
+.hb-streams-page {
+  padding: 4.5rem 1rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .hb-streams-title {
+    font-size: clamp(2.1rem, 3vw, 3.25rem);
+    letter-spacing: -0.03em;
+    margin: 0 0 2.25rem;
+  }
+
+  /* Live streams grid (cards) */
+  .hb-streams-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    max-width: 960px; /* match the settings card width */
+    margin: 0 0 3rem;
+  }
+
+  .hb-stream-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem;
+    border-radius: 20px;
+    background: var(--secondary);
+    border: 1px solid var(--primary-low);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+    transition: transform 120ms ease, box-shadow 160ms ease;
+  }
+
+  .hb-stream-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 56px rgba(0, 0, 0, 0.16);
+  }
+
+  .hb-stream-avatar {
+    flex: 0 0 auto;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hb-stream-avatar img.avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  }
+
+  .hb-stream-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .hb-stream-user-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .hb-stream-username {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .hb-stream-live-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: #fff;
+    background: linear-gradient(135deg, #ff3b7a, #ff4f00);
+    box-shadow: 0 10px 22px rgba(255, 59, 122, 0.35);
+  }
+
+  .hb-stream-listen-btn {
+    margin-left: auto;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-weight: 800;
+  }
+
+  .hb-stream-listen-btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .hb-stream-meta {
+    margin-top: 0.55rem;
+    font-size: 1.05rem;
+    color: var(--primary-high);
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .hb-stream-meta-sep {
+    opacity: 0.6;
+  }
+
+  .hb-streams-empty {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    margin: 0 0 3rem;
+  }
+
+  .hb-streams-updated {
+    font-size: 0.95rem;
+    opacity: 0.7;
+    margin-top: 1.5rem;
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 640px) {
+    .hb-streams-list {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .hb-stream-card {
+      padding: 1.1rem 1.1rem;
+    }
+
+    .hb-stream-avatar,
+    .hb-stream-avatar img.avatar {
+      width: 60px;
+      height: 60px;
+    }
+
+    .hb-stream-username {
+      font-size: 1.2rem;
+    }
+
+    .hb-stream-listen-btn {
+      margin-left: 0;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// --- Stream settings card (KEEP) -------------------------------------------
+
+.hb-stream-settings {
+  margin: 0 0 3rem;
+  padding: 1.75rem 2rem 2rem;
+  border-radius: 20px;
+  background: var(--secondary);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  max-width: 960px;
+}
+
+.hb-streams-page .hb-stream-settings {
+  /* lijn de kaart uit onder de pagina-titel */
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .hb-stream-settings {
+    padding: 1.25rem 1.25rem 1.75rem;
+  }
+}
+
+.hb-stream-settings-section {
+  padding: 1.35rem 0;
+  border-top: 1px solid var(--primary-low);
+}
+
+.hb-stream-settings-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.hb-stream-settings-section:last-child {
+  padding-bottom: 0;
+}
+
+.hb-stream-settings-section-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  margin: 0 0 0.25rem;
+}
+
+.hb-stream-settings-section-desc {
+  font-size: 1rem;
+  opacity: 0.75;
+  margin: 0 0 0.9rem;
+}
+
+.hb-stream-settings-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hb-stream-settings-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  background: var(--primary-low);
+  color: var(--primary);
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.hb-stream-settings-copy {
+  padding: 0.5rem 0.9rem;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.hb-stream-settings-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.hb-stream-settings-subtle {
+  font-size: 0.95rem;
+  opacity: 0.75;
+  margin-top: 0.65rem;
+}
+
+/* Wrapper rond de settings-component: alleen layout, geen kaart */
+.hb-stream-settings-wrapper {
+  margin: 0 0 2.5rem;
+}
+
+.hb-stream-settings-card {
+  max-width: 960px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* headings/labels inside settings */
+.hb-stream-settings-label {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.hb-stream-settings h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}

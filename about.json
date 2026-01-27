@@ -1,0 +1,9 @@
+{
+  "name": "Discourse Streamers Component",
+  "about_url": "https://github.com/heartbeatpleasure/Discourse-Streamers-Component",
+  "license_url": "https://github.com/heartbeatpleasure/Discourse-Streamers-Component/blob/main/LICENSE",
+  "component": true,
+  "theme_version": "0.1.0",
+  "authors": "Chris",
+  "minimum_discourse_version": "3.3.0"
+}
