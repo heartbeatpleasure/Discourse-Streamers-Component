@@ -269,3 +269,89 @@
   font-weight: 800;
   margin-bottom: 0.4rem;
 }
+
+// --- Mini player ------------------------------------------------------------
+
+.hb-streamers-player {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  z-index: 1002;
+
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  padding: 0.75rem 0.9rem;
+  border-radius: 18px;
+
+  background: var(--secondary);
+  border: 1px solid var(--primary-low);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+}
+
+.hb-streamers-player-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hb-streamers-player-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.hb-streamers-player-name {
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hb-streamers-player-status {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.hb-streamers-player-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hb-streamers-player-error {
+  margin-top: 0.15rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.hb-streamers-player-controls {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.hb-streamers-player-controls .btn {
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.hb-streamers-player-volume {
+  width: 90px;
+}
+
+@media (max-width: 640px) {
+  .hb-streamers-player {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}

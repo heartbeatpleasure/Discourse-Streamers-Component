@@ -1,0 +1,74 @@
+{{!-- assets/javascripts/discourse/components/streamers-player-bar.hbs --}}
+
+{{#if this.canShow}}
+  <div class="hb-streamers-player" role="region" aria-label="Stream player">
+    <div class="hb-streamers-player-main">
+      <div class="hb-streamers-player-title">
+        <span class="hb-streamers-player-name">
+          {{or this.stream.name this.stream.username}}
+        </span>
+
+        <span class="hb-streamers-player-status">
+          {{#if this.streamersPlayer.isLoading}}
+            {{i18n "hb_streamers.loading"}}
+          {{else if this.streamersPlayer.isPlaying}}
+            {{i18n "hb_streamers.playing"}}
+          {{else if this.streamersPlayer.isPaused}}
+            {{i18n "hb_streamers.paused"}}
+          {{else if this.streamersPlayer.errorMessage}}
+            {{i18n "hb_streamers.error"}}
+          {{/if}}
+        </span>
+      </div>
+
+      {{#if this.stream.title}}
+        <div class="hb-streamers-player-subtitle">
+          {{this.stream.title}}
+        </div>
+      {{/if}}
+
+      {{#if this.streamersPlayer.errorMessage}}
+        <div class="hb-streamers-player-error">
+          {{this.streamersPlayer.errorMessage}}
+        </div>
+      {{/if}}
+    </div>
+
+    <div class="hb-streamers-player-controls">
+      {{d-button
+        class="btn-small"
+        action=this.togglePlayPause
+        label=(if this.streamersPlayer.isPlaying "hb_streamers.pause" (if this.streamersPlayer.isPaused "hb_streamers.resume" "hb_streamers.play"))
+      }}
+
+      {{d-button
+        class="btn-small"
+        action=this.stop
+        label="hb_streamers.stop"
+      }}
+
+      {{d-button
+        class="btn-small"
+        action=this.toggleMute
+        label=(if this.streamersPlayer.muted "hb_streamers.unmute" "hb_streamers.mute")
+      }}
+
+      <input
+        class="hb-streamers-player-volume"
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        value={{this.streamersPlayer.volume}}
+        {{on "input" this.setVolume}}
+        aria-label="Volume"
+      />
+
+      {{d-button
+        class="btn-small"
+        action=this.openExternal
+        label="hb_streamers.open"
+      }}
+    </div>
+  </div>
+{{/if}}
