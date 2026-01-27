@@ -1,4 +1,5 @@
 import { apiInitializer } from "discourse/lib/api";
+import StreamersPlayerBar from "../components/streamers-player-bar";
 
 export default apiInitializer("1.0", (api) => {
   if (!api.headerIcons || !api.headerIcons.add) {
@@ -9,7 +10,7 @@ export default apiInitializer("1.0", (api) => {
     "hb-streamers-player",
     <template>
       <li class="hb-streamers-header-item">
-        {{streamers-player-bar}}
+        <StreamersPlayerBar />
       </li>
     </template>,
     { after: "search" }
