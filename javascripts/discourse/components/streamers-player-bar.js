@@ -4,6 +4,8 @@ import { inject as service } from "@ember/service";
 import { action } from "@ember/object";
 import { tracked } from "@glimmer/tracking";
 
+const MAX_USERNAME_LEN = 24;
+
 export default class StreamersPlayerBar extends Component {
   @service("streamers-player") streamersPlayer;
 
@@ -15,6 +17,14 @@ export default class StreamersPlayerBar extends Component {
 
   get canShow() {
     return this.streamersPlayer.isVisible;
+  }
+
+  get displayUsername() {
+    const u = (this.stream?.username || "").toString().trim();
+    if (!u) return "";
+
+    if (u.length <= MAX_USERNAME_LEN) return u;
+    return `${u.slice(0, MAX_USERNAME_LEN - 1)}…`;
   }
 
   get toggleLabelKey() {

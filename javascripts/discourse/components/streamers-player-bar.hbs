@@ -4,8 +4,8 @@
   <li class="hb-streamers-header-item">
     <div class="hb-streamers-header-player" role="region" aria-label="Livestream player">
       <div class="hb-streamers-header-left">
-        <span class="hb-streamers-header-name">
-          {{or this.stream.name this.stream.username}}
+        <span class="hb-streamers-header-name" title={{this.stream.username}}>
+          {{this.displayUsername}}
         </span>
 
         <span class="hb-streamers-header-status">
@@ -42,7 +42,6 @@
       </button>
 
       {{#if this.menuOpen}}
-        {{!-- Klik buiten het menu sluit het menu --}}
         <div class="hb-streamers-header-backdrop" {{on "click" this.closeMenu}}></div>
 
         <div class="hb-streamers-header-menu" role="dialog" aria-label="Player options">
