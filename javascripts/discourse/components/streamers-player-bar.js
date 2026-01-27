@@ -18,12 +18,15 @@ export default class StreamersPlayerBar extends Component {
   }
 
   get toggleLabelKey() {
-    if (this.streamersPlayer.isPlaying) return "hb_streamers.pause";
-    return "hb_streamers.play";
+    return this.streamersPlayer.isPlaying ? "hb_streamers.pause" : "hb_streamers.play";
   }
 
   get toggleIcon() {
     return this.streamersPlayer.isPlaying ? "pause" : "play";
+  }
+
+  get muteLabelKey() {
+    return this.streamersPlayer.muted ? "hb_streamers.unmute" : "hb_streamers.mute";
   }
 
   @action
@@ -51,6 +54,11 @@ export default class StreamersPlayerBar extends Component {
   stop() {
     this.menuOpen = false;
     this.streamersPlayer.stop();
+  }
+
+  @action
+  toggleMute() {
+    this.streamersPlayer.toggleMute();
   }
 
   @action

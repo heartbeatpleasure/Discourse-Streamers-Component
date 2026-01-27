@@ -272,8 +272,6 @@
 
 // --- Header player ----------------------------------------------------------
 
-// --- Header player ----------------------------------------------------------
-
 .hb-streamers-header-item {
   display: flex;
   align-items: center;
@@ -282,7 +280,7 @@
   margin-left: 10px;
   padding-left: 12px;
   border-left: 2px solid var(--primary-low-mid, var(--primary-low));
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .hb-streamers-header-player {
@@ -291,7 +289,7 @@
   align-items: center;
   gap: 0.25rem;
 
-  padding: 0.28rem 0.4rem;
+  padding: 0.26rem 0.38rem;
   border-radius: 999px;
 
   background: var(--secondary);
@@ -325,7 +323,7 @@
   border: 0;
   background: transparent;
   border-radius: 999px;
-  padding: 0.2rem 0.35rem;
+  padding: 0.18rem 0.32rem;
   cursor: pointer;
   line-height: 1;
 }
@@ -339,6 +337,14 @@
   height: 0.95em;
 }
 
+.hb-streamers-header-dots {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.9;
+}
+
 /* Dropdown menu */
 .hb-streamers-header-menu {
   position: absolute;
@@ -346,7 +352,7 @@
   right: 0;
   z-index: 2000;
 
-  min-width: 220px;
+  min-width: 240px;
   padding: 10px;
   border-radius: 12px;
 
@@ -369,12 +375,17 @@
 
 .hb-streamers-header-volume {
   flex: 1 1 auto;
-  width: 120px;
+  width: 140px;
 }
 
-.hb-streamers-header-stopbtn {
+.hb-streamers-header-menu-actions {
   margin-top: 10px;
-  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+.hb-streamers-header-actionbtn {
+  flex: 1 1 50%;
   padding: 0.45rem 0.65rem;
   border-radius: 10px;
   border: 1px solid var(--primary-low);
@@ -383,11 +394,15 @@
   font-weight: 700;
 }
 
-.hb-streamers-header-stopbtn:hover {
+.hb-streamers-header-actionbtn:hover {
   background: var(--primary-low-mid, var(--primary-low));
 }
 
-/* Mobiel: houd context (naam) zichtbaar, maar maak 't compacter */
+.hb-streamers-header-stopbtn {
+  /* optioneel: stop iets “sterker” laten voelen */
+}
+
+/* Mobiel: houd context (naam) zichtbaar, status weg */
 @media (max-width: 700px) {
   .hb-streamers-header-item {
     margin-left: 8px;
@@ -405,10 +420,10 @@
   }
 
   .hb-streamers-header-status {
-    display: none; /* status weg, scheelt ruimte */
+    display: none;
   }
 
   .hb-streamers-header-menu {
-    min-width: 200px;
+    min-width: 220px;
   }
 }

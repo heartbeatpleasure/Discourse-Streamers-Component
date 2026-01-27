@@ -37,7 +37,7 @@
       title={{i18n "hb_streamers.options"}}
       aria-label={{i18n "hb_streamers.options"}}
     >
-      {{d-icon "cog"}}
+      <span class="hb-streamers-header-dots" aria-hidden="true">⋯</span>
     </button>
 
     {{#if this.menuOpen}}
@@ -59,13 +59,23 @@
           />
         </div>
 
-        <button
-          type="button"
-          class="hb-streamers-header-stopbtn"
-          {{on "click" this.stop}}
-        >
-          {{i18n "hb_streamers.stop"}}
-        </button>
+        <div class="hb-streamers-header-menu-actions">
+          <button
+            type="button"
+            class="hb-streamers-header-actionbtn"
+            {{on "click" this.toggleMute}}
+          >
+            {{i18n this.muteLabelKey}}
+          </button>
+
+          <button
+            type="button"
+            class="hb-streamers-header-actionbtn hb-streamers-header-stopbtn"
+            {{on "click" this.stop}}
+          >
+            {{i18n "hb_streamers.stop"}}
+          </button>
+        </div>
       </div>
     {{/if}}
   </div>
