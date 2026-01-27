@@ -1,17 +1,3 @@
 en:
   theme_metadata:
     description: "Frontend for the HeartbeatPleasure Streamers plugin."
-  js:
-    hb_streamers:
-      listen: "Listen"
-      pause: "Pause"
-      resume: "Resume"
-      play: "Play"
-      stop: "Stop"
-      mute: "Mute"
-      unmute: "Unmute"
-      open: "Open"
-      playing: "Playing"
-      paused: "Paused"
-      loading: "Loading…"
-      error: "Error"
