@@ -15,6 +15,8 @@ export default class StreamerSettingsComponent extends Component {
   @tracked loadError = null;
   @tracked settings = null;
   @tracked rotatingKey = false;
+
+  // NEW: stream_tag state
   @tracked savingStreamTag = false;
   @tracked selectedStreamTag = "";
 
@@ -50,6 +52,7 @@ export default class StreamerSettingsComponent extends Component {
     }
   }
 
+  // NEW: options supplied by plugin (stream_tag_options)
   get streamTagOptions() {
     const raw = this.settings?.stream_tag_options;
 
@@ -67,6 +70,7 @@ export default class StreamerSettingsComponent extends Component {
     return [];
   }
 
+  // Only show picker when plugin provides options
   get showStreamTagPicker() {
     return this.streamTagOptions.length > 0;
   }
@@ -148,15 +152,14 @@ export default class StreamerSettingsComponent extends Component {
     }
   }
 
+  // NEW: save stream_tag (single select)
   @action
   async onStreamTagChange(event) {
     const previous = this.selectedStreamTag;
     const next = event?.target?.value ?? "";
 
-    // Keep UI responsive immediately
     this.selectedStreamTag = next;
 
-    // Prevent overlapping updates (rare, but can happen with rapid clicking)
     if (this.savingStreamTag) return;
 
     this.savingStreamTag = true;
@@ -169,12 +172,11 @@ export default class StreamerSettingsComponent extends Component {
       const saved = response?.stream_tag || "";
       this.selectedStreamTag = saved;
 
-      // Keep the settings model in sync
+      // keep settings in sync
       this.settings = { ...this.settings, stream_tag: saved || null };
 
       this.toast?.success?.(I18n.t("streamers_settings.stream_tag_saved"));
     } catch {
-      // Revert to the previous value when saving fails
       this.selectedStreamTag = previous;
       this.dialog.alert(I18n.t("streamers_settings.stream_tag_save_error"));
     } finally {
