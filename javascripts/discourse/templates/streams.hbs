@@ -29,6 +29,12 @@
                 {{i18n "streamers.live"}}
               </span>
 
+              {{#if stream.stream_tag}}
+                <span class="hb-stream-tag-pill">
+                  {{stream.stream_tag}}
+                </span>
+              {{/if}}
+
              {{streamers-listen-button stream=stream}}
             </div>
 

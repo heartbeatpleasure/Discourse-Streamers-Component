@@ -15,12 +15,15 @@ export default class StreamerSettingsComponent extends Component {
   @tracked loadError = null;
   @tracked settings = null;
   @tracked rotatingKey = false;
+  @tracked savingStreamTag = false;
+  @tracked selectedStreamTag = "";
 
   constructor() {
     super(...arguments);
 
     if (this.args?.streamSettings) {
       this.settings = this.args.streamSettings;
+      this.selectedStreamTag = this.settings?.stream_tag || "";
       this.loading = false;
     } else {
       this._loadSettings();
@@ -37,12 +40,35 @@ export default class StreamerSettingsComponent extends Component {
         data.allowed = true;
       }
       this.settings = data;
+      this.selectedStreamTag = data?.stream_tag || "";
     } catch (e) {
       this.loadError = e;
       this.settings = null;
+      this.selectedStreamTag = "";
     } finally {
       this.loading = false;
     }
+  }
+
+  get streamTagOptions() {
+    const raw = this.settings?.stream_tag_options;
+
+    if (Array.isArray(raw)) {
+      return raw.map((t) => String(t).trim()).filter(Boolean);
+    }
+
+    if (typeof raw === "string") {
+      return raw
+        .split("|")
+        .map((t) => String(t).trim())
+        .filter(Boolean);
+    }
+
+    return [];
+  }
+
+  get showStreamTagPicker() {
+    return this.streamTagOptions.length > 0;
   }
 
   get isEnabled() {
@@ -119,6 +145,40 @@ export default class StreamerSettingsComponent extends Component {
       this.dialog.alert(I18n.t("streamers_settings.rotate_key_error"));
     } finally {
       this.rotatingKey = false;
+    }
+  }
+
+  @action
+  async onStreamTagChange(event) {
+    const previous = this.selectedStreamTag;
+    const next = event?.target?.value ?? "";
+
+    // Keep UI responsive immediately
+    this.selectedStreamTag = next;
+
+    // Prevent overlapping updates (rare, but can happen with rapid clicking)
+    if (this.savingStreamTag) return;
+
+    this.savingStreamTag = true;
+    try {
+      const response = await ajax("/streamers/me/stream_tag", {
+        type: "POST",
+        data: { stream_tag: next },
+      });
+
+      const saved = response?.stream_tag || "";
+      this.selectedStreamTag = saved;
+
+      // Keep the settings model in sync
+      this.settings = { ...this.settings, stream_tag: saved || null };
+
+      this.toast?.success?.(I18n.t("streamers_settings.stream_tag_saved"));
+    } catch {
+      // Revert to the previous value when saving fails
+      this.selectedStreamTag = previous;
+      this.dialog.alert(I18n.t("streamers_settings.stream_tag_save_error"));
+    } finally {
+      this.savingStreamTag = false;
     }
   }
 

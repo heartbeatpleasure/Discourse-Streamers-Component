@@ -55,6 +55,38 @@
         </div>
       </div>
 
+      {{#if this.showStreamTagPicker}}
+        <div class="hb-stream-settings-section">
+          <div class="hb-stream-settings-label">
+            {{i18n "streamers_settings.stream_tag_label"}}
+          </div>
+
+          <div class="hb-stream-settings-row">
+            <select
+              class="hb-stream-settings-select"
+              value={{this.selectedStreamTag}}
+              {{on "change" this.onStreamTagChange}}
+              disabled={{this.savingStreamTag}}
+            >
+              <option value="">{{i18n "streamers_settings.stream_tag_none"}}</option>
+              {{#each this.streamTagOptions as |opt|}}
+                <option value={{opt}}>{{opt}}</option>
+              {{/each}}
+            </select>
+
+            {{#if this.savingStreamTag}}
+              <span class="hb-stream-settings-inline-status">
+                {{i18n "streamers_settings.stream_tag_saving"}}
+              </span>
+            {{/if}}
+          </div>
+
+          <p class="hb-stream-settings-help">
+            {{i18n "streamers_settings.stream_tag_help"}}
+          </p>
+        </div>
+      {{/if}}
+
       <div class="hb-stream-settings-section">
         <div class="hb-stream-settings-label">
           {{i18n "streamers_settings.stream_key_label"}}
