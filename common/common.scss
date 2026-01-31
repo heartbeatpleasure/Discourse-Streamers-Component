@@ -493,3 +493,37 @@
   font-size: 0.95rem;
   opacity: 0.75;
 }
+
+// --- Streams live indicator badge (menu/nav) --------------------------------
+
+.hb-streams-live-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+
+  color: var(--secondary);
+  background: var(--danger);
+
+  pointer-events: none;
+  vertical-align: middle;
+}
+
+// In sidebar we generally want it pushed to the far right
+.sidebar-wrapper a .hb-streams-live-badge,
+.sidebar-section a .hb-streams-live-badge {
+  margin-left: auto;
+}
+
+// In top nav we just want a small gap after the label
+#navigation-bar a .hb-streams-live-badge {
+  margin-left: 0.5em;
+}
