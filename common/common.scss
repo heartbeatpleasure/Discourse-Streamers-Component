@@ -517,13 +517,13 @@
   vertical-align: middle;
 }
 
-// In sidebar we generally want it pushed to the far right
+// Sidebar links are usually flex; push badge to the far right
 .sidebar-wrapper a .hb-streams-live-badge,
 .sidebar-section a .hb-streams-live-badge {
   margin-left: auto;
 }
 
-// In top nav we just want a small gap after the label
+// Top nav: small gap after label
 #navigation-bar a .hb-streams-live-badge {
   margin-left: 0.5em;
 }

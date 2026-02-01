@@ -2,77 +2,72 @@
 import { apiInitializer } from "discourse/lib/api";
 import { ajax } from "discourse/lib/ajax";
 
-// Polling interval for the UI indicator. The server should cache for a short TTL,
-// so this can stay reasonably frequent without hammering Icecast.
-const POLL_VISIBLE_MS = 30000;
+const STATUS_URL = "/streams/status.json";
+
+// Adaptive polling:
+// - When live: poll faster so badge disappears quickly after stream ends
+// - When idle: poll slowly to reduce load
+const POLL_VISIBLE_LIVE_MS = 8000;
+const POLL_VISIBLE_IDLE_MS = 60000;
 const POLL_HIDDEN_MS = 120000;
 
-const STATUS_URL = "/streams/status.json";
+// If the UI (menu) appears and our last fetch is older than this, refresh immediately
+const STALE_REFRESH_MS = 8000;
 
 function isVisible() {
   return !document.hidden;
 }
 
-function normalizeHref(href) {
+function normalizePath(href) {
   if (!href) return "";
   try {
-    // Handle absolute URLs
     const url = new URL(href, window.location.origin);
     return url.pathname;
   } catch {
-    // Handle relative paths
     return String(href).split("?")[0].split("#")[0];
   }
 }
 
-function findStreamsNavLinks() {
-  // Prefer known navigation containers to avoid touching links in post content.
-  const selectors = [
-    "#navigation-bar a[href]",
-    ".sidebar-wrapper a[href]",
-    ".sidebar-section a[href]",
-    ".hamburger-panel a[href]",
-    ".d-header a[href]",
-  ];
+function isStreamsLink(a) {
+  const path = normalizePath(a.getAttribute("href"));
+  return path === "/streams" || path === "/streams/";
+}
 
+function findStreamsLinksIn(root) {
+  if (!root) return [];
+  const anchors = root.querySelectorAll ? root.querySelectorAll("a[href]") : [];
+  return Array.from(anchors).filter(isStreamsLink);
+}
+
+function findAllStreamsNavLinks() {
+  // Limit scanning to known navigation containers where menu links live
   const containers = document.querySelectorAll(
-    "#navigation-bar, .sidebar-wrapper, .sidebar-section, .hamburger-panel, .d-header"
+    "#navigation-bar, .sidebar-wrapper, .sidebar-section, .hamburger-panel, .d-header, .mobile-nav"
   );
 
   const links = new Set();
 
-  // Fast path: scan only in known containers
-  containers.forEach((container) => {
-    container.querySelectorAll("a[href]").forEach((a) => {
-      const path = normalizeHref(a.getAttribute("href"));
-      if (path === "/streams" || path === "/streams/") {
-        links.add(a);
-      }
-    });
+  containers.forEach((c) => {
+    findStreamsLinksIn(c).forEach((a) => links.add(a));
   });
 
-  // Fallback: if containers are missing in a given layout, try a conservative global scan
+  // Conservative fallback if theme/layout differs
   if (!links.size) {
-    document.querySelectorAll(selectors.join(",")).forEach((a) => {
-      const path = normalizeHref(a.getAttribute("href"));
-      if (path === "/streams" || path === "/streams/") {
-        links.add(a);
-      }
+    document.querySelectorAll("a[href]").forEach((a) => {
+      // Avoid scanning post content on huge pages by only considering links that look like nav links
+      // (still safe: if it matches /streams, badge append is harmless)
+      if (isStreamsLink(a)) links.add(a);
     });
   }
 
   return Array.from(links);
 }
 
-function upsertBadge(link, { live, count }) {
-  // We insert inside the link to keep the clickable area correct.
-  // The badge itself is pointer-events:none (via CSS) so clicks still trigger the link.
+function upsertBadge(link, state) {
   let badge = link.querySelector(":scope > .hb-streams-live-badge");
 
-  if (!live || !count) {
-    if (badge) {
-      badge.remove();
-    }
+  if (!state.live || !state.count) {
+    if (badge) badge.remove();
     return;
   }
 
@@ -83,50 +78,60 @@ function upsertBadge(link, { live, count }) {
     link.appendChild(badge);
   }
 
-  const display = count > 9 ? "9+" : String(count);
+  const display = state.count > 9 ? "9+" : String(state.count);
   badge.textContent = display;
-
-  // Helpful tooltip without relying on extra i18n keys
-  badge.title = `${count} live stream${count === 1 ? "" : "s"}`;
+  badge.title = `${state.count} live stream${state.count === 1 ? "" : "s"}`;
 }
 
 export default apiInitializer("1.8.0", (api) => {
-  // Members-only forum: indicator is only useful for logged-in users.
-  // Guard just in case the component is ever enabled on a login page.
   const currentUser = api.getCurrentUser?.();
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return; // members-only forum: no need on anon pages
 
   let state = { live: false, count: 0 };
+  let lastFetchAt = 0;
   let timerId = null;
+  let inFlight = false;
   let endpointMissing = false;
 
   function applyStateToNav() {
-    const links = findStreamsNavLinks();
+    const links = findAllStreamsNavLinks();
     links.forEach((link) => upsertBadge(link, state));
   }
 
-  async function fetchStatus() {
-    if (endpointMissing) return;
+  async function fetchStatus({ force = false } = {}) {
+    if (endpointMissing || inFlight) return;
 
+    const now = Date.now();
+    if (!force && lastFetchAt && now - lastFetchAt < 1500) {
+      return; // small anti-spam guard
+    }
+
+    inFlight = true;
     try {
       const res = await ajax(STATUS_URL);
-      const live = !!res?.live;
-      const count = Number(res?.count || 0);
+      state = {
+        live: !!res?.live,
+        count: Number(res?.count || 0),
+      };
+      lastFetchAt = Date.now();
 
-      const next = { live, count };
-      state = next;
-
-      // Always re-apply; links may have been re-rendered.
+      // Links can be re-rendered, always re-apply after fetch
       applyStateToNav();
     } catch (e) {
-      // If the endpoint doesn't exist yet (plugin not updated), stop polling quietly.
-      // Other transient errors are ignored; we'll try again later.
-      if (e?.jqXHR?.status === 404) {
+      // If plugin endpoint isn't present yet, stop quietly
+      const code = e?.jqXHR?.status;
+      if (code === 404) {
         endpointMissing = true;
       }
+      // On transient errors we keep previous state; next schedule will retry.
+    } finally {
+      inFlight = false;
     }
+  }
+
+  function nextIntervalMs() {
+    if (!isVisible()) return POLL_HIDDEN_MS;
+    return state.live ? POLL_VISIBLE_LIVE_MS : POLL_VISIBLE_IDLE_MS;
   }
 
   function scheduleNext() {
@@ -137,27 +142,64 @@ export default apiInitializer("1.8.0", (api) => {
       timerId = null;
     }
 
-    const base = isVisible() ? POLL_VISIBLE_MS : POLL_HIDDEN_MS;
-    const jitter = Math.floor(Math.random() * 3000);
+    const base = nextIntervalMs();
+    // jitter prevents thundering herd
+    const jitter = Math.floor(Math.random() * (state.live ? 1200 : 4000));
+
     timerId = setTimeout(async () => {
       await fetchStatus();
       scheduleNext();
     }, base + jitter);
   }
 
-  // Keep the badge present after route changes (menus can rerender)
+  function maybeRefreshBecauseUIAppeared() {
+    // When the menu/links appear (mobile), immediately apply the last known state
+    applyStateToNav();
+
+    // If our last fetch is stale, refresh immediately so the user doesn't wait for the next poll
+    const now = Date.now();
+    if (isVisible() && (!lastFetchAt || now - lastFetchAt > STALE_REFRESH_MS)) {
+      fetchStatus({ force: true });
+    }
+  }
+
+  // Re-apply on route changes (nav can re-render)
   api.onPageChange(() => {
-    applyStateToNav();
+    maybeRefreshBecauseUIAppeared();
   });
 
+  // If tab becomes visible, refresh quickly
   document.addEventListener("visibilitychange", () => {
+    if (isVisible()) {
+      fetchStatus({ force: true });
+    }
     scheduleNext();
   });
 
-  // Initial kick (tiny delay helps when menu renders async)
+  // MutationObserver: catches mobile hamburger menu opening (DOM nodes are created)
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (!m.addedNodes || !m.addedNodes.length) continue;
+
+      for (const node of m.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue;
+
+        // If the added subtree contains a /streams link, update immediately
+        const links = findStreamsLinksIn(node);
+        if (links.length) {
+          maybeRefreshBecauseUIAppeared();
+          return;
+        }
+      }
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Initial kick
   setTimeout(async () => {
-    applyStateToNav();
-    await fetchStatus();
+    maybeRefreshBecauseUIAppeared();
+    await fetchStatus({ force: true });
     scheduleNext();
-  }, 500);
+  }, 300);
 });
