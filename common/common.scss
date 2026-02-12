@@ -13,9 +13,15 @@
 
   /* Live streams grid (cards) */
   .hb-streams-list {
+    /*
+      One streamer per row (full width).
+      Previously this used an auto-fit grid, which created multiple columns
+      when several people were live.
+    */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1.25rem;
+    width: 100%;
     max-width: 960px; /* match the settings card width */
     margin: 0 0 3rem;
   }
