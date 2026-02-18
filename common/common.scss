@@ -110,6 +110,12 @@
     cursor: not-allowed;
   }
 
+  .hb-stream-chat-btn {
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-weight: 800;
+  }
+
   .hb-stream-meta {
     margin-top: 0.55rem;
     font-size: 1.05rem;
@@ -160,6 +166,12 @@
 
     .hb-stream-listen-btn {
       margin-left: 0;
+      width: 100%;
+      justify-content: center;
+    }
+
+
+    .hb-stream-chat-btn {
       width: 100%;
       justify-content: center;
     }
