@@ -2,7 +2,6 @@
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
-import { openURL } from "discourse/lib/url";
 import getURL from "discourse-common/lib/get-url";
 
 export default class StreamersChatButton extends Component {
@@ -28,7 +27,7 @@ export default class StreamersChatButton extends Component {
 
     // Canonical chat URL is: /chat/c/<slug>/<id>
     // We only store the id, so we try to fetch the slug. If that fails, we fall back
-    // to a dash slug; the route should still resolve by id in most Discourse versions.
+    // to a dash slug; the route should still resolve by id in many Discourse versions.
     let slug = "-";
 
     try {
@@ -59,6 +58,8 @@ export default class StreamersChatButton extends Component {
       // ignore
     }
 
-    openURL(getURL(`/chat/c/${slug}/${channelId}`));
+    // Don't rely on openURL/DiscourseURL helpers (they differ across versions);
+    // a plain navigation is the most compatible.
+    window.location.href = getURL(`/chat/c/${slug}/${channelId}`);
   }
 }
