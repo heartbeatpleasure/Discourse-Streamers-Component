@@ -22,7 +22,7 @@
           <div class="hb-stream-main">
             <div class="hb-stream-user-row">
               <span class="hb-stream-username">
-                {{or stream.name stream.username}}
+                {{or stream.username stream.name}}
               </span>
 
               <span class="hb-stream-live-pill">
@@ -37,8 +37,7 @@
               {{/if}}
 
              <div class="hb-stream-actions">
-                {{!-- Prefer a per-tag chat channel id (stream.chat_topic_id), but keep the global setting as fallback --}}
-                {{streamers-chat-button chatTopicId=(or stream.chat_topic_id this.model.chat_topic_id)}}
+                {{streamers-chat-button chatTopicId=this.model.chat_topic_id}}
                 {{streamers-listen-button stream=stream}}
               </div>
             </div>
