@@ -10,20 +10,24 @@
       {{#each this.model.live_streams as |stream|}}
         <article class="hb-stream-card">
           <div class="hb-stream-avatar">
-            {{avatar
-              stream
-              usernamePath="username"
-              namePath="name"
-              avatarTemplatePath="avatar_template"
-              imageSize="huge"
-            }}
+            {{#link-to "user" stream.username class="hb-stream-user-link"}}
+              {{avatar
+                stream
+                usernamePath="username"
+                namePath="name"
+                avatarTemplatePath="avatar_template"
+                imageSize="huge"
+              }}
+            {{/link-to}}
           </div>
 
           <div class="hb-stream-main">
             <div class="hb-stream-user-row">
-              <span class="hb-stream-username">
-                {{or stream.username stream.name}}
-              </span>
+              {{#link-to "user" stream.username class="hb-stream-user-link"}}
+                <span class="hb-stream-username">
+                  {{or stream.username stream.name}}
+                </span>
+              {{/link-to}}
 
               <span class="hb-stream-live-pill">
                 {{i18n "streamers.live"}}
