@@ -72,23 +72,6 @@
     flex-wrap: wrap;
   }
 
-  /* Make avatar + username open the user profile without looking like a link */
-  .hb-stream-user-link {
-    color: inherit;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .hb-stream-user-link:hover,
-  .hb-stream-user-link:focus,
-  .hb-stream-user-link:active,
-  .hb-stream-user-link:visited {
-    color: inherit;
-    text-decoration: none;
-  }
-
   .hb-stream-username {
     font-size: 1.35rem;
     font-weight: 800;
@@ -99,6 +82,20 @@
     white-space: nowrap;
     max-width: 100%;
   }
+
+  /* Make username/avatar clickable without looking like a link */
+  .hb-stream-user-link,
+  .hb-stream-user-link:visited,
+  .hb-stream-user-link:hover,
+  .hb-stream-user-link:active {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .hb-stream-user-link:focus {
+    outline: none;
+  }
+
 
   .hb-stream-live-pill {
     display: inline-flex;
