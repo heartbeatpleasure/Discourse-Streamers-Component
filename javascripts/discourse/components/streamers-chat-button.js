@@ -2,6 +2,7 @@
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
+import DiscourseURL from "discourse/lib/url";
 import getURL from "discourse-common/lib/get-url";
 
 export default class StreamersChatButton extends Component {
@@ -58,8 +59,14 @@ export default class StreamersChatButton extends Component {
       // ignore
     }
 
-    // Don't rely on openURL/DiscourseURL helpers (they differ across versions);
-    // a plain navigation is the most compatible.
-    window.location.href = getURL(`/chat/c/${slug}/${channelId}`);
+    const path = `/chat/c/${slug}/${channelId}`;
+
+    // Prefer SPA routing (no full refresh) so audio continues playing.
+    // Fall back to a hard navigation only if routeTo isn't available.
+    if (DiscourseURL?.routeTo) {
+      DiscourseURL.routeTo(path);
+    } else {
+      window.location.href = getURL(path);
+    }
   }
 }
