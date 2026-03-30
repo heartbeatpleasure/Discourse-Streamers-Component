@@ -1,14 +1,12 @@
-// assets/javascripts/discourse/components/streamers-chat-button.js
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
+import DButton from "discourse/components/d-button";
 import { ajax } from "discourse/lib/ajax";
 import DiscourseURL from "discourse/lib/url";
 import getURL from "discourse-common/lib/get-url";
 
 export default class StreamersChatButton extends Component {
   get chatChannelId() {
-    // NOTE: despite the setting name (historical), in your setup this value represents
-    // a Discourse Chat *channel* id.
     const raw = this.args.chatTopicId;
     const id = parseInt(raw, 10);
     return Number.isFinite(id) ? id : 0;
@@ -25,14 +23,9 @@ export default class StreamersChatButton extends Component {
     }
 
     const channelId = this.chatChannelId;
-
-    // Canonical chat URL is: /chat/c/<slug>/<id>
-    // We only store the id, so we try to fetch the slug. If that fails, we fall back
-    // to a dash slug; the route should still resolve by id in many Discourse versions.
     let slug = "-";
 
     try {
-      // Endpoint varies by Discourse/Chat version; try a couple of common ones.
       let data;
 
       try {
@@ -61,12 +54,21 @@ export default class StreamersChatButton extends Component {
 
     const path = `/chat/c/${slug}/${channelId}`;
 
-    // Prefer SPA routing (no full refresh) so audio continues playing.
-    // Fall back to a hard navigation only if routeTo isn't available.
     if (DiscourseURL?.routeTo) {
       DiscourseURL.routeTo(path);
     } else {
       window.location.href = getURL(path);
     }
   }
+
+  <template>
+    {{#if this.isEnabled}}
+      <DButton
+        @class="btn-default hb-stream-chat-btn"
+        @action={{this.openChat}}
+        @icon="comments"
+        @label="streamers.chat"
+      />
+    {{/if}}
+  </template>
 }

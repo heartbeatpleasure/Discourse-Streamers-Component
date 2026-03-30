@@ -1,7 +1,7 @@
-// assets/javascripts/discourse/components/streamers-listen-button.js
 import Component from "@glimmer/component";
-import { inject as service } from "@ember/service";
+import { service } from "@ember/service";
 import { action } from "@ember/object";
+import DButton from "discourse/components/d-button";
 
 export default class StreamersListenButton extends Component {
   @service("streamers-player") streamersPlayer;
@@ -24,9 +24,7 @@ export default class StreamersListenButton extends Component {
 
   get labelKey() {
     if (this.disabled) return "hb_streamers.listen";
-
     if (!this.isCurrent) return "hb_streamers.listen";
-
     if (this.streamersPlayer.isLoading) return "hb_streamers.loading";
     if (this.streamersPlayer.isPlaying) return "hb_streamers.pause";
     if (this.streamersPlayer.isPaused) return "hb_streamers.resume";
@@ -39,4 +37,13 @@ export default class StreamersListenButton extends Component {
     if (this.disabled) return;
     this.streamersPlayer.playOrToggle(this.stream);
   }
+
+  <template>
+    <DButton
+      @class="btn-primary hb-stream-listen-btn"
+      @action={{this.onClick}}
+      @disabled={{this.disabled}}
+      @label={{this.labelKey}}
+    />
+  </template>
 }
