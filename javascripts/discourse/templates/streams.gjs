@@ -11,9 +11,9 @@ export default <template>
       {{i18n "streamers.title"}}
     </h1>
 
-    {{#if this.model.live_streams.length}}
+    {{#if @model.live_streams.length}}
       <div class="hb-streams-list">
-        {{#each this.model.live_streams as |stream|}}
+        {{#each @model.live_streams as |stream|}}
           <article class="hb-stream-card">
             <div class="hb-stream-avatar">
               {{#if stream.username}}
@@ -69,7 +69,7 @@ export default <template>
 
                 <div class="hb-stream-actions">
                   <StreamersChatButton
-                    @chatTopicId={{if stream.chat_topic_id stream.chat_topic_id this.model.chat_topic_id}}
+                    @chatTopicId={{if stream.chat_topic_id stream.chat_topic_id @model.chat_topic_id}}
                   />
                   <StreamersListenButton @stream={{stream}} />
                 </div>
@@ -104,21 +104,21 @@ export default <template>
       </p>
     {{/if}}
 
-    {{#if this.model.me}}
-      {{#if this.model.me.allowed}}
+    {{#if @model.me}}
+      {{#if @model.me.allowed}}
         <section class="hb-stream-settings-wrapper">
           <div class="hb-stream-settings-card">
-            <StreamerSettings @streamSettings={{this.model.me}} @timezone={{this.model.timezone}} />
+            <StreamerSettings @streamSettings={{@model.me}} @timezone={{@model.timezone}} />
           </div>
         </section>
       {{/if}}
     {{/if}}
 
-    {{#if this.model.updated_at}}
+    {{#if @model.updated_at}}
       <p class="hb-streams-updated">
         {{i18n
           "streamers.last_updated"
-          time=(if this.model.formatted_updated_at this.model.formatted_updated_at this.model.updated_at)
+          time=(if @model.formatted_updated_at @model.formatted_updated_at @model.updated_at)
         }}
       </p>
     {{/if}}
