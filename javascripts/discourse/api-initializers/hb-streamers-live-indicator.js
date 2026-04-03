@@ -3,6 +3,7 @@ import { apiInitializer } from "discourse/lib/api";
 import { ajax } from "discourse/lib/ajax";
 
 const STATUS_URL = "/streams/status.json";
+const STATUS_EVENT = "hb-streamers:status-update";
 
 // Adaptive polling:
 // - When live: poll faster so badge disappears quickly after stream ends
@@ -98,6 +99,16 @@ export default apiInitializer("1.8.0", (api) => {
     links.forEach((link) => upsertBadge(link, state));
   }
 
+  function applyExternalStatus(detail) {
+    const nextCount = Number(detail?.count || 0);
+    state = {
+      live: typeof detail?.live === "boolean" ? detail.live : nextCount > 0,
+      count: nextCount,
+    };
+    lastFetchAt = Date.now();
+    applyStateToNav();
+  }
+
   async function fetchStatus({ force = false } = {}) {
     if (endpointMissing || inFlight) return;
 
@@ -163,6 +174,12 @@ export default apiInitializer("1.8.0", (api) => {
     }
   }
 
+  function handleStatusEvent(event) {
+    if (!event?.detail) return;
+    applyExternalStatus(event.detail);
+    scheduleNext();
+  }
+
   // Re-apply on route changes (nav can re-render)
   api.onPageChange(() => {
     maybeRefreshBecauseUIAppeared();
@@ -175,6 +192,8 @@ export default apiInitializer("1.8.0", (api) => {
     }
     scheduleNext();
   });
+
+  window.addEventListener(STATUS_EVENT, handleStatusEvent);
 
   // MutationObserver: catches mobile hamburger menu opening (DOM nodes are created)
   const observer = new MutationObserver((mutations) => {

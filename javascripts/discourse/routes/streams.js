@@ -5,6 +5,7 @@ import moment from "moment";
 import { later, cancel } from "@ember/runloop";
 
 const POLL_INTERVAL_MS = 15000;
+const STATUS_EVENT = "hb-streamers:status-update";
 
 function formatDateTime(value, timezone) {
   if (!value) return null;
@@ -30,6 +31,31 @@ function formatDateTime(value, timezone) {
   return m.utc().format("DD-MM-YYYY [at] HH:mm");
 }
 
+function normalizeLiveCount(streamsData) {
+  const liveStreams = Array.isArray(streamsData?.live_streams)
+    ? streamsData.live_streams
+    : [];
+
+  return liveStreams.length;
+}
+
+function publishStatusUpdate(streamsData) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  const count = normalizeLiveCount(streamsData);
+
+  window.dispatchEvent(
+    new CustomEvent(STATUS_EVENT, {
+      detail: {
+        live: count > 0,
+        count,
+      },
+    })
+  );
+}
+
 export default class StreamsRoute extends DiscourseRoute {
   pollTimer = null;
   isPolling = false;
@@ -52,6 +78,8 @@ export default class StreamsRoute extends DiscourseRoute {
         me = null;
       }
     }
+
+    publishStatusUpdate(streamsData);
 
     return Object.assign({}, streamsData, { me, formatted_updated_at, timezone });
   }
@@ -124,9 +152,11 @@ export default class StreamsRoute extends DiscourseRoute {
       });
 
       if (controller && !controller.isDestroyed && !controller.isDestroying) {
-        // Replacing the whole model ensures the template updates (streams added/removed + listener counts)
+        // Replacing the whole model keeps the /streams page in sync without a hard refresh.
         controller.set("model", nextModel);
       }
+
+      publishStatusUpdate(streamsData);
     } catch {
       // ignore transient errors; try again next tick
     } finally {
