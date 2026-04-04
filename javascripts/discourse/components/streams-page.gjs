@@ -23,13 +23,44 @@ function normalizeModel(model) {
   };
 }
 
+function fallbackFormattedNow(timezone) {
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone || undefined,
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date());
+
+    const byType = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+    if (byType.day && byType.month && byType.year && byType.hour && byType.minute) {
+      return `${byType.day}-${byType.month}-${byType.year} at ${byType.hour}:${byType.minute}`;
+    }
+  } catch {
+    // fall through
+  }
+
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const yyyy = String(now.getFullYear());
+  const hh = String(now.getHours()).padStart(2, "0");
+  const min = String(now.getMinutes()).padStart(2, "0");
+  return `${dd}-${mm}-${yyyy} at ${hh}:${min}`;
+}
+
 export default class StreamsPageComponent extends Component {
   @tracked state = normalizeModel(this.args.initialModel);
+  @tracked lastUpdatedDisplay = null;
 
   constructor() {
     super(...arguments);
 
     this._handlePageUpdate = this._handlePageUpdate.bind(this);
+    this._syncLastUpdatedDisplay(this.state, { ensureFallback: true });
 
     if (typeof window !== "undefined") {
       window.addEventListener(PAGE_EVENT, this._handlePageUpdate);
@@ -41,6 +72,18 @@ export default class StreamsPageComponent extends Component {
     if (!this.state.me) {
       this._loadMe();
     }
+  }
+
+  get hasUpdatedDisplay() {
+    return !!this.lastUpdatedDisplay;
+  }
+
+  _syncLastUpdatedDisplay(nextState, { ensureFallback = false } = {}) {
+    this.lastUpdatedDisplay =
+      nextState?.formatted_updated_at ||
+      nextState?.updated_at ||
+      this.lastUpdatedDisplay ||
+      (ensureFallback ? fallbackFormattedNow(nextState?.timezone || this.state?.timezone) : null);
   }
 
   async _loadMe() {
@@ -68,6 +111,8 @@ export default class StreamsPageComponent extends Component {
       timezone: nextState.timezone ?? this.state.timezone,
       chat_topic_id: nextState.chat_topic_id ?? this.state.chat_topic_id,
     });
+
+    this._syncLastUpdatedDisplay(this.state, { ensureFallback: true });
   }
 
   <template>
@@ -182,12 +227,9 @@ export default class StreamsPageComponent extends Component {
         {{/if}}
       {{/if}}
 
-      {{#if this.state.updated_at}}
+      {{#if this.hasUpdatedDisplay}}
         <p class="hb-streams-updated">
-          {{i18n
-            "streamers.last_updated"
-            time=(if this.state.formatted_updated_at this.state.formatted_updated_at this.state.updated_at)
-          }}
+          {{i18n "streamers.last_updated" time=this.lastUpdatedDisplay}}
         </p>
       {{/if}}
     </div>
