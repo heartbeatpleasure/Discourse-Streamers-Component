@@ -6,6 +6,13 @@ import { later, cancel } from "@ember/runloop";
 
 const POLL_INTERVAL_MS = 15000;
 const STATUS_EVENT = "hb-streamers:status-update";
+const PAGE_EVENT = "hb-streamers:page-update";
+
+
+function noCacheUrl(path) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}_hb_streamers_ts=${Date.now()}`;
+}
 
 function formatDateTime(value, timezone) {
   if (!value) return null;
@@ -56,12 +63,24 @@ function publishStatusUpdate(streamsData) {
   );
 }
 
+function publishPageUpdate(state) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent(PAGE_EVENT, {
+      detail: { state },
+    })
+  );
+}
+
 export default class StreamsRoute extends DiscourseRoute {
   pollTimer = null;
   isPolling = false;
 
   async model() {
-    const streamsData = await ajax("/streams.json");
+    const streamsData = await ajax(noCacheUrl("/streams.json"));
 
     const timezone =
       this.currentUser?.user_option?.timezone || this.currentUser?.timezone || null;
@@ -81,7 +100,10 @@ export default class StreamsRoute extends DiscourseRoute {
 
     publishStatusUpdate(streamsData);
 
-    return Object.assign({}, streamsData, { me, formatted_updated_at, timezone });
+    const initialState = Object.assign({}, streamsData, { me, formatted_updated_at, timezone });
+    publishPageUpdate(initialState);
+
+    return initialState;
   }
 
   setupController(controller, model) {
@@ -133,7 +155,7 @@ export default class StreamsRoute extends DiscourseRoute {
     this.isPolling = true;
 
     try {
-      const streamsData = await ajax("/streams.json");
+      const streamsData = await ajax(noCacheUrl("/streams.json"));
 
       const controller = this.controllerFor("streams");
       const currentModel = controller?.model || {};
@@ -157,6 +179,7 @@ export default class StreamsRoute extends DiscourseRoute {
       }
 
       publishStatusUpdate(streamsData);
+      publishPageUpdate(nextModel);
     } catch {
       // ignore transient errors; try again next tick
     } finally {
