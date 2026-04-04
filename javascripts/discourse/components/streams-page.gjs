@@ -23,7 +23,12 @@ function normalizeModel(model) {
   };
 }
 
-function fallbackFormattedNow(timezone) {
+function formatUpdatedAt(value, timezone) {
+  const date = value ? new Date(value) : new Date();
+  if (Number.isNaN(date.getTime())) {
+    return value || null;
+  }
+
   try {
     const parts = new Intl.DateTimeFormat("en-GB", {
       timeZone: timezone || undefined,
@@ -32,24 +37,32 @@ function fallbackFormattedNow(timezone) {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      second: "2-digit",
       hour12: false,
-    }).formatToParts(new Date());
+    }).formatToParts(date);
 
     const byType = Object.fromEntries(parts.map((p) => [p.type, p.value]));
-    if (byType.day && byType.month && byType.year && byType.hour && byType.minute) {
-      return `${byType.day}-${byType.month}-${byType.year} at ${byType.hour}:${byType.minute}`;
+    if (
+      byType.day &&
+      byType.month &&
+      byType.year &&
+      byType.hour &&
+      byType.minute &&
+      byType.second
+    ) {
+      return `${byType.day}-${byType.month}-${byType.year} at ${byType.hour}:${byType.minute}:${byType.second}`;
     }
   } catch {
     // fall through
   }
 
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2, "0");
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const yyyy = String(now.getFullYear());
-  const hh = String(now.getHours()).padStart(2, "0");
-  const min = String(now.getMinutes()).padStart(2, "0");
-  return `${dd}-${mm}-${yyyy} at ${hh}:${min}`;
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yyyy = String(date.getFullYear());
+  const hh = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const sec = String(date.getSeconds()).padStart(2, "0");
+  return `${dd}-${mm}-${yyyy} at ${hh}:${min}:${sec}`;
 }
 
 export default class StreamsPageComponent extends Component {
@@ -80,10 +93,10 @@ export default class StreamsPageComponent extends Component {
 
   _syncLastUpdatedDisplay(nextState, { ensureFallback = false } = {}) {
     this.lastUpdatedDisplay =
+      formatUpdatedAt(nextState?.updated_at, nextState?.timezone || this.state?.timezone) ||
       nextState?.formatted_updated_at ||
-      nextState?.updated_at ||
       this.lastUpdatedDisplay ||
-      (ensureFallback ? fallbackFormattedNow(nextState?.timezone || this.state?.timezone) : null);
+      (ensureFallback ? formatUpdatedAt(null, nextState?.timezone || this.state?.timezone) : null);
   }
 
   async _loadMe() {
