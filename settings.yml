@@ -1,0 +1,3 @@
+show_streamers_link_in_top_navigation:
+  default: true
+  description: "Show the Streamers link in the top navigation."
