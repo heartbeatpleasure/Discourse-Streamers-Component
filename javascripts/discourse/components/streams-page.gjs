@@ -1,6 +1,9 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
+import { action } from "@ember/object";
 import { registerDestructor } from "@ember/destroyable";
+import { fn } from "@ember/helper";
+import { on } from "@ember/modifier";
 import { ajax } from "discourse/lib/ajax";
 import avatar from "discourse/helpers/avatar";
 import { i18n } from "discourse-i18n";
@@ -68,6 +71,7 @@ function formatUpdatedAt(value, timezone) {
 export default class StreamsPageComponent extends Component {
   @tracked state = normalizeModel(this.args.initialModel);
   @tracked lastUpdatedDisplay = null;
+  @tracked listenerDialogStream = null;
 
   constructor() {
     super(...arguments);
@@ -89,6 +93,19 @@ export default class StreamsPageComponent extends Component {
 
   get hasUpdatedDisplay() {
     return !!this.lastUpdatedDisplay;
+  }
+
+  get listenerDialogKnownListeners() {
+    const listeners = this.listenerDialogStream?.known_listeners;
+    return Array.isArray(listeners) ? listeners : [];
+  }
+
+  get listenerDialogPublicCount() {
+    return Number(this.listenerDialogStream?.public_listener_count || 0);
+  }
+
+  get listenerDialogUsername() {
+    return this.listenerDialogStream?.username || this.listenerDialogStream?.name || "";
   }
 
   _syncLastUpdatedDisplay(nextState, { ensureFallback = false } = {}) {
@@ -125,7 +142,24 @@ export default class StreamsPageComponent extends Component {
       chat_topic_id: nextState.chat_topic_id ?? this.state.chat_topic_id,
     });
 
+    if (this.listenerDialogStream?.mount) {
+      const refreshedStream = this.state.live_streams.find(
+        (stream) => stream.mount === this.listenerDialogStream.mount
+      );
+      this.listenerDialogStream = refreshedStream || null;
+    }
+
     this._syncLastUpdatedDisplay(this.state, { ensureFallback: true });
+  }
+
+  @action
+  openListenerDialog(stream) {
+    this.listenerDialogStream = stream;
+  }
+
+  @action
+  closeListenerDialog() {
+    this.listenerDialogStream = null;
   }
 
   <template>
@@ -199,9 +233,13 @@ export default class StreamsPageComponent extends Component {
                 </div>
 
                 <div class="hb-stream-meta">
-                  <span class="hb-stream-meta-item">
+                  <button
+                    type="button"
+                    class="hb-stream-listeners-trigger"
+                    {{on "click" (fn this.openListenerDialog stream)}}
+                  >
                     {{i18n "streamers.listeners" count=stream.listeners}}
-                  </span>
+                  </button>
 
                   {{#if stream.age}}
                     <span class="hb-stream-meta-sep">•</span>
@@ -225,6 +263,85 @@ export default class StreamsPageComponent extends Component {
         <p class="hb-streams-empty">
           {{i18n "streamers.no_streams"}}
         </p>
+      {{/if}}
+
+      {{#if this.listenerDialogStream}}
+        <div
+          class="hb-stream-listeners-backdrop"
+          role="presentation"
+          {{on "click" this.closeListenerDialog}}
+        ></div>
+
+        <section
+          class="hb-stream-listeners-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-label={{i18n "streamers.listeners_title" username=this.listenerDialogUsername}}
+        >
+          <div class="hb-stream-listeners-dialog-header">
+            <div>
+              <div class="hb-stream-listeners-eyebrow">
+                {{i18n "streamers.listeners_known"}}
+              </div>
+              <h2 class="hb-stream-listeners-title">
+                {{i18n "streamers.listeners_title" username=this.listenerDialogUsername}}
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              class="hb-stream-listeners-close"
+              aria-label={{i18n "streamers.listeners_close"}}
+              {{on "click" this.closeListenerDialog}}
+            >
+              ×
+            </button>
+          </div>
+
+          {{#if this.listenerDialogKnownListeners.length}}
+            <div class="hb-stream-listeners-list">
+              {{#each this.listenerDialogKnownListeners as |listener|}}
+                <a
+                  class="hb-stream-listener-row"
+                  href={{hbUserProfileUrl listener.username}}
+                  title={{listener.username}}
+                >
+                  <span class="hb-stream-listener-avatar">
+                    {{avatar
+                      listener
+                      usernamePath="username"
+                      namePath="name"
+                      avatarTemplatePath="avatar_template"
+                      imageSize="large"
+                    }}
+                  </span>
+
+                  <span class="hb-stream-listener-main">
+                    <span class="hb-stream-listener-name">
+                      {{listener.username}}
+                    </span>
+
+                    {{#if listener.has_multiple_sessions}}
+                      <span class="hb-stream-listener-sessions">
+                        {{i18n "streamers.listener_sessions" count=listener.session_count}}
+                      </span>
+                    {{/if}}
+                  </span>
+                </a>
+              {{/each}}
+            </div>
+          {{else}}
+            <p class="hb-stream-listeners-empty">
+              {{i18n "streamers.listeners_none_known"}}
+            </p>
+          {{/if}}
+
+          {{#if this.listenerDialogPublicCount}}
+            <p class="hb-stream-listeners-public">
+              {{i18n "streamers.listeners_public" count=this.listenerDialogPublicCount}}
+            </p>
+          {{/if}}
+        </section>
       {{/if}}
 
       {{#if this.state.me}}

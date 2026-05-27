@@ -86,6 +86,10 @@ export default class StreamerSettingsComponent extends Component {
     return this.settings?.public_listen_url || "";
   }
 
+  get showPublicListenUrl() {
+    return !!this.settings?.public_listen_url_enabled && !!this.listenUrl;
+  }
+
   get hasStreamKey() {
     return !!this.settings?.has_stream_key;
   }
@@ -263,19 +267,30 @@ export default class StreamerSettingsComponent extends Component {
             </div>
           </div>
 
-          <div class="hb-stream-settings-section">
-            <div class="hb-stream-settings-label">
-              {{i18n "streamers_settings.listen_url_label"}}
+          {{#if this.showPublicListenUrl}}
+            <div class="hb-stream-settings-section">
+              <div class="hb-stream-settings-label">
+                {{i18n "streamers_settings.listen_url_label"}}
+              </div>
+              <div class="hb-stream-settings-row">
+                <code class="hb-stream-settings-mono">{{this.listenUrl}}</code>
+                <DButton
+                  @class="btn btn-small"
+                  @label="streamers_settings.copy"
+                  @action={{fn this.copy "listenUrl"}}
+                />
+              </div>
             </div>
-            <div class="hb-stream-settings-row">
-              <code class="hb-stream-settings-mono">{{this.listenUrl}}</code>
-              <DButton
-                @class="btn btn-small"
-                @label="streamers_settings.copy"
-                @action={{fn this.copy "listenUrl"}}
-              />
+          {{else}}
+            <div class="hb-stream-settings-section">
+              <div class="hb-stream-settings-label">
+                {{i18n "streamers_settings.listen_url_label"}}
+              </div>
+              <p class="hb-stream-settings-help">
+                {{i18n "streamers_settings.listen_url_disabled"}}
+              </p>
             </div>
-          </div>
+          {{/if}}
 
           {{#if this.showStreamTagPicker}}
             <div class="hb-stream-settings-section">
