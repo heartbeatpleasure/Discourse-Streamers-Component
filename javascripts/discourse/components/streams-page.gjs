@@ -237,13 +237,19 @@ export default class StreamsPageComponent extends Component {
                 </div>
 
                 <div class="hb-stream-meta">
-                  <button
-                    type="button"
-                    class="hb-stream-listeners-trigger"
-                    {{on "click" (fn this.openListenerDialog stream)}}
-                  >
-                    {{i18n "streamers.listeners" count=stream.listeners}}
-                  </button>
+                  {{#if stream.listener_details_visible}}
+                    <button
+                      type="button"
+                      class="hb-stream-listeners-trigger"
+                      {{on "click" (fn this.openListenerDialog stream)}}
+                    >
+                      {{i18n "streamers.listeners" count=stream.listeners}}
+                    </button>
+                  {{else}}
+                    <span class="hb-stream-meta-item">
+                      {{i18n "streamers.listeners" count=stream.listeners}}
+                    </span>
+                  {{/if}}
 
                   {{#if stream.age}}
                     <span class="hb-stream-meta-sep">•</span>
