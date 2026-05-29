@@ -1,6 +1,18 @@
 // assets/javascripts/discourse/services/streamers-player.js
 import Service from "@ember/service";
 import { tracked } from "@glimmer/tracking";
+import { ajax } from "discourse/lib/ajax";
+
+const STREAMS_URL = "/streams.json";
+
+function noCacheUrl(path) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}_hb_streamers_player_ts=${Date.now()}`;
+}
+
+function sameMount(a, b) {
+  return !!a && !!b && a === b;
+}
 
 export default class StreamersPlayerService extends Service {
   @tracked currentStream = null; // { mount, listen_url, username, name, avatar_template, title }
@@ -98,17 +110,63 @@ export default class StreamersPlayerService extends Service {
     } catch {}
   }
 
-  async resume() {
-    if (!this._audio || !this.currentStream?.listen_url) return;
+  async resume(preferredStream = null) {
+    if (!this._audio || !this.currentStream?.mount) return;
 
     this.status = "loading";
     this.errorMessage = null;
 
     try {
+      const freshStream = await this._freshStreamForResume(preferredStream);
+      if (!freshStream?.listen_url) {
+        throw new Error("Stream is no longer available.");
+      }
+
+      this._applyStream(freshStream, { replaceSource: true });
       await this._audio.play();
     } catch (e) {
       this.status = "error";
       this.errorMessage = e?.message || "Could not start playback.";
+    }
+  }
+
+  async _freshStreamForResume(preferredStream = null) {
+    const mount = this.currentStream?.mount;
+    if (!mount) return null;
+
+    if (
+      sameMount(preferredStream?.mount, mount) &&
+      preferredStream?.listen_url &&
+      preferredStream.listen_url !== this.currentStream?.listen_url &&
+      !preferredStream?.listener_blocked
+    ) {
+      return preferredStream;
+    }
+
+    const data = await ajax(noCacheUrl(STREAMS_URL));
+    const streams = Array.isArray(data?.live_streams) ? data.live_streams : [];
+    const freshStream = streams.find((stream) => sameMount(stream?.mount, mount));
+
+    if (!freshStream || freshStream.listener_blocked || !freshStream.listen_url) {
+      return null;
+    }
+
+    return freshStream;
+  }
+
+  _applyStream(stream, { replaceSource = false } = {}) {
+    this.currentStream = {
+      user_id: stream.user_id,
+      username: stream.username,
+      name: stream.name,
+      avatar_template: stream.avatar_template,
+      mount: stream.mount,
+      listen_url: stream.listen_url,
+      title: stream.title,
+    };
+
+    if (replaceSource && this._audio && stream.listen_url && this._audio.src !== stream.listen_url) {
+      this._audio.src = stream.listen_url;
     }
   }
 
@@ -122,19 +180,11 @@ export default class StreamersPlayerService extends Service {
 
     if (same) {
       if (this.isPlaying) return this.pause();
-      if (this.isPaused) return this.resume();
+      if (this.isPaused) return this.resume(stream);
       // loading/error -> opnieuw proberen
     }
 
-    this.currentStream = {
-      user_id: stream.user_id,
-      username: stream.username,
-      name: stream.name,
-      avatar_template: stream.avatar_template,
-      mount: stream.mount,
-      listen_url: stream.listen_url,
-      title: stream.title,
-    };
+    this._applyStream(stream);
 
     if (!this._audio) return;
 
