@@ -729,3 +729,39 @@
     padding: 1.15rem 1rem calc(1.15rem + env(safe-area-inset-bottom));
   }
 }
+
+
+/*
+  Discourse user-cards are rendered in global portals. When opened from the
+  stream listener modal, keep the native card above the stream modal/backdrop.
+*/
+#d-menu-portals.hb-stream-native-card-layer,
+.d-menu-portals.hb-stream-native-card-layer,
+.fk-d-menu-modal.hb-stream-native-card-layer,
+.fk-d-menu-content.hb-stream-native-card-layer,
+.floating-ui-portal.hb-stream-native-card-layer,
+.ember-basic-dropdown-content.hb-stream-native-card-layer,
+#user-card.hb-stream-native-card-layer,
+#group-card.hb-stream-native-card-layer,
+.user-card.hb-stream-native-card-layer,
+.group-card.hb-stream-native-card-layer,
+.hb-stream-native-card-layer {
+  z-index: 2147483000 !important;
+}
+
+#user-card.hb-stream-native-card-popup,
+#group-card.hb-stream-native-card-popup,
+.user-card.hb-stream-native-card-popup,
+.group-card.hb-stream-native-card-popup,
+.hb-stream-native-card-popup {
+  z-index: 2147483001 !important;
+}
+
+#d-menu-portals.hb-stream-native-card-layer,
+.d-menu-portals.hb-stream-native-card-layer,
+.fk-d-menu-modal.hb-stream-native-card-layer,
+.fk-d-menu-content.hb-stream-native-card-layer,
+.floating-ui-portal.hb-stream-native-card-layer,
+.ember-basic-dropdown-content.hb-stream-native-card-layer {
+  position: relative;
+}

@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
+import { service } from "@ember/service";
 import { registerDestructor } from "@ember/destroyable";
 import { fn } from "@ember/helper";
 import { on } from "@ember/modifier";
@@ -69,6 +70,8 @@ function formatUpdatedAt(value, timezone) {
 }
 
 export default class StreamsPageComponent extends Component {
+  @service appEvents;
+
   @tracked state = normalizeModel(this.args.initialModel);
   @tracked lastUpdatedDisplay = null;
   @tracked listenerDialogStream = null;
@@ -83,6 +86,7 @@ export default class StreamsPageComponent extends Component {
       window.addEventListener(PAGE_EVENT, this._handlePageUpdate);
       registerDestructor(this, () => {
         window.removeEventListener(PAGE_EVENT, this._handlePageUpdate);
+        this._clearNativeCardLayer();
       });
     }
 
@@ -161,9 +165,148 @@ export default class StreamsPageComponent extends Component {
     this.listenerDialogStream = stream;
   }
 
+  cleanUsername(username) {
+    return String(username || "").replace(/^@+/, "").trim();
+  }
+
+  _clearNativeCardLayer() {
+    try {
+      document
+        .querySelectorAll(".hb-stream-native-card-layer, .hb-stream-native-card-popup")
+        .forEach((el) => {
+          el.classList?.remove("hb-stream-native-card-layer");
+          el.classList?.remove("hb-stream-native-card-popup");
+        });
+    } catch {
+      // ignore
+    }
+  }
+
+  _raiseNativeCardLayer() {
+    const apply = () => {
+      try {
+        const selectors = [
+          "#d-menu-portals",
+          ".d-menu-portals",
+          ".fk-d-menu-modal",
+          ".fk-d-menu-content",
+          ".floating-ui-portal",
+          ".ember-basic-dropdown-content",
+          "#user-card",
+          "#group-card",
+          ".user-card",
+          ".group-card",
+          ".card-contents",
+          ".card-content",
+        ];
+
+        document.querySelectorAll(selectors.join(",")).forEach((el) => {
+          if (!el?.classList) {
+            return;
+          }
+
+          const isKnownCard =
+            el.id === "user-card" ||
+            el.id === "group-card" ||
+            el.classList.contains("user-card") ||
+            el.classList.contains("group-card") ||
+            Boolean(el.closest?.("#user-card,#group-card,.user-card,.group-card"));
+
+          const looksLikeCardContent =
+            el.classList.contains("card-contents") ||
+            (el.classList.contains("card-content") &&
+              Boolean(
+                el.querySelector?.(
+                  ".user-card-avatar,.user-card-controls,.names,.metadata,.card-row,[data-user-card]"
+                )
+              ));
+
+          const isKnownPortal =
+            el.id === "d-menu-portals" ||
+            el.classList.contains("d-menu-portals") ||
+            el.classList.contains("fk-d-menu-modal") ||
+            el.classList.contains("fk-d-menu-content") ||
+            el.classList.contains("floating-ui-portal") ||
+            el.classList.contains("ember-basic-dropdown-content");
+
+          if (!(isKnownCard || looksLikeCardContent || isKnownPortal)) {
+            return;
+          }
+
+          el.classList.add("hb-stream-native-card-layer");
+          if (isKnownCard || looksLikeCardContent) {
+            el.classList.add("hb-stream-native-card-popup");
+          }
+
+          let parent = el.parentElement;
+          while (parent && parent !== document.body && parent !== document.documentElement) {
+            if (
+              parent.id === "d-menu-portals" ||
+              parent.classList?.contains("d-menu-portals") ||
+              parent.classList?.contains("fk-d-menu-modal") ||
+              parent.classList?.contains("fk-d-menu-content") ||
+              parent.classList?.contains("floating-ui-portal") ||
+              parent.classList?.contains("ember-basic-dropdown-content")
+            ) {
+              parent.classList.add("hb-stream-native-card-layer");
+            }
+            parent = parent.parentElement;
+          }
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    apply();
+    setTimeout(apply, 60);
+    setTimeout(apply, 180);
+  }
+
+  _triggerNativeUserCard(username, event) {
+    if (!event) {
+      return;
+    }
+
+    // Keep normal profile-link behavior for modified clicks / new-tab actions.
+    if (event.button && event.button !== 0) {
+      return;
+    }
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    const cleanedUsername = this.cleanUsername(username);
+    if (!cleanedUsername || cleanedUsername === "unknown") {
+      return;
+    }
+
+    const target = event.currentTarget || event.target?.closest?.("[data-user-card]");
+    if (!target || !this.appEvents?.trigger) {
+      return;
+    }
+
+    event.preventDefault?.();
+    event.stopPropagation?.();
+    this._raiseNativeCardLayer();
+    this.appEvents.trigger("topic-header:trigger-user-card", cleanedUsername, target, event);
+    this._raiseNativeCardLayer();
+  }
+
+  @action
+  handleStreamerUserClick(stream, event) {
+    this._triggerNativeUserCard(stream?.username, event);
+  }
+
+  @action
+  handleListenerUserClick(listener, event) {
+    this._triggerNativeUserCard(listener?.username, event);
+  }
+
   @action
   closeListenerDialog() {
     this.listenerDialogStream = null;
+    this._clearNativeCardLayer();
   }
 
   <template>
@@ -179,9 +322,11 @@ export default class StreamsPageComponent extends Component {
               <div class="hb-stream-avatar">
                 {{#if stream.username}}
                   <a
-                    class="hb-stream-user-link"
+                    class="hb-stream-user-link trigger-user-card"
                     href={{hbUserProfileUrl stream.username}}
+                    data-user-card={{this.cleanUsername stream.username}}
                     title={{stream.username}}
+                    {{on "click" (fn this.handleStreamerUserClick stream)}}
                   >
                     {{avatar
                       stream
@@ -207,9 +352,11 @@ export default class StreamsPageComponent extends Component {
                   <span class="hb-stream-username">
                     {{#if stream.username}}
                       <a
-                        class="hb-stream-user-link"
+                        class="hb-stream-user-link trigger-user-card"
                         href={{hbUserProfileUrl stream.username}}
+                        data-user-card={{this.cleanUsername stream.username}}
                         title={{stream.username}}
+                        {{on "click" (fn this.handleStreamerUserClick stream)}}
                       >
                         {{if stream.username stream.username stream.name}}
                       </a>
@@ -313,9 +460,11 @@ export default class StreamsPageComponent extends Component {
               <div class="hb-stream-listeners-list">
                 {{#each this.listenerDialogKnownListeners as |listener|}}
                   <a
-                    class="hb-stream-listener-row"
+                    class="hb-stream-listener-row trigger-user-card"
                     href={{hbUserProfileUrl listener.username}}
+                    data-user-card={{this.cleanUsername listener.username}}
                     title={{listener.username}}
+                    {{on "click" (fn this.handleListenerUserClick listener)}}
                   >
                     <span class="hb-stream-listener-avatar">
                       {{avatar
