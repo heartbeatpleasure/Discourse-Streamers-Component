@@ -799,3 +799,107 @@
 .hb-stream-settings-block-staff-bypass {
   margin-top: 0.65rem;
 }
+
+// --- Blocked listeners autocomplete / polish -------------------------------
+
+.hb-stream-settings-block-form {
+  align-items: flex-start;
+}
+
+.hb-stream-settings-block-search {
+  position: relative;
+  flex: 1 1 340px;
+  max-width: min(100%, 520px);
+}
+
+.hb-stream-settings-block-input {
+  width: 100%;
+  min-width: 280px;
+}
+
+.hb-stream-settings-block-submit {
+  height: 38px;
+  margin-top: 0;
+  align-self: flex-start;
+}
+
+.hb-stream-settings-block-suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--primary-low);
+  border-radius: 12px;
+  background: var(--secondary);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+}
+
+.hb-stream-settings-block-suggestion,
+.hb-stream-settings-block-suggestion-empty {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  text-align: left;
+}
+
+.hb-stream-settings-block-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.hb-stream-settings-block-suggestion:hover,
+.hb-stream-settings-block-suggestion:focus {
+  background: var(--primary-very-low);
+  outline: none;
+}
+
+.hb-stream-settings-block-suggestion + .hb-stream-settings-block-suggestion {
+  border-top: 1px solid var(--primary-low);
+}
+
+.hb-stream-settings-block-suggestion-avatar,
+.hb-stream-settings-block-suggestion-avatar img.avatar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.hb-stream-settings-block-suggestion-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hb-stream-settings-block-suggestion-username {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hb-stream-settings-block-suggestion-name,
+.hb-stream-settings-block-suggestion-empty {
+  font-size: 0.9rem;
+  color: var(--primary-high);
+}
+
+@media (max-width: 640px) {
+  .hb-stream-settings-block-search,
+  .hb-stream-settings-block-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .hb-stream-settings-block-submit {
+    width: 100%;
+  }
+}

@@ -22,6 +22,10 @@ export default class StreamerSettingsComponent extends Component {
   @tracked savingStreamTag = false;
   @tracked selectedStreamTag = "";
   @tracked blockedUsernameInput = "";
+  @tracked blockedUserCandidates = [];
+  @tracked searchingBlockedUsers = false;
+  @tracked showBlockedUserCandidates = false;
+  @tracked selectedBlockedUserCandidate = null;
   @tracked addingListenerBlock = false;
   @tracked removingListenerBlockId = null;
 
@@ -116,6 +120,17 @@ export default class StreamerSettingsComponent extends Component {
 
   get staffBypassListenerBlocks() {
     return !!this.listenerBlocks.staff_bypass_listener_blocks;
+  }
+
+  get hasBlockedUserCandidates() {
+    return this.blockedUserCandidates.length > 0;
+  }
+
+  get showBlockedUserCandidateMenu() {
+    return (
+      this.showBlockedUserCandidates &&
+      (this.searchingBlockedUsers || this.hasBlockedUserCandidates || this.blockedUsernameInput.trim().length >= 2)
+    );
   }
 
   get isRemovingListenerBlock() {
@@ -223,16 +238,125 @@ export default class StreamerSettingsComponent extends Component {
     };
   }
 
+  _cleanUsernameInput(value) {
+    return String(value || "").trim().replace(/^@+/, "");
+  }
+
+  _listenerBlockErrorMessage(error, fallbackKey) {
+    const code = error?.jqXHR?.responseJSON?.errors?.[0] || error?.payload?.errors?.[0];
+    if (code) {
+      const key = `streamers_settings.listener_blocks_error_${code}`;
+      const translated = I18n.t(key);
+      if (translated && translated !== key) {
+        return translated;
+      }
+    }
+
+    return I18n.t(fallbackKey);
+  }
+
+  _clearBlockedUserCandidates() {
+    this.blockedUserCandidates = [];
+    this.searchingBlockedUsers = false;
+    this.showBlockedUserCandidates = false;
+    this.selectedBlockedUserCandidate = null;
+  }
+
+  _scheduleBlockedUserSearch(term) {
+    window.clearTimeout(this._blockedUserSearchTimer);
+
+    const cleaned = this._cleanUsernameInput(term);
+    this.selectedBlockedUserCandidate = null;
+
+    if (cleaned.length < 2) {
+      this._clearBlockedUserCandidates();
+      return;
+    }
+
+    const sequence = (this._blockedUserSearchSequence || 0) + 1;
+    this._blockedUserSearchSequence = sequence;
+    this.searchingBlockedUsers = true;
+    this.showBlockedUserCandidates = true;
+
+    this._blockedUserSearchTimer = window.setTimeout(async () => {
+      try {
+        const response = await ajax("/streamers/me/listener_block_candidates", {
+          data: { q: cleaned },
+        });
+
+        if (this._blockedUserSearchSequence !== sequence) {
+          return;
+        }
+
+        this.blockedUserCandidates = response?.users || [];
+      } catch {
+        if (this._blockedUserSearchSequence === sequence) {
+          this.blockedUserCandidates = [];
+        }
+      } finally {
+        if (this._blockedUserSearchSequence === sequence) {
+          this.searchingBlockedUsers = false;
+        }
+      }
+    }, 220);
+  }
+
   @action
   onBlockedUsernameInput(event) {
-    this.blockedUsernameInput = event?.target?.value || "";
+    const value = event?.target?.value || "";
+    this.blockedUsernameInput = value;
+    this._scheduleBlockedUserSearch(value);
+  }
+
+  @action
+  onBlockedUsernameFocus() {
+    if (this.blockedUsernameInput.trim().length >= 2) {
+      this.showBlockedUserCandidates = true;
+      if (!this.hasBlockedUserCandidates && !this.searchingBlockedUsers) {
+        this._scheduleBlockedUserSearch(this.blockedUsernameInput);
+      }
+    }
+  }
+
+  @action
+  onBlockedUsernameBlur() {
+    window.setTimeout(() => {
+      this.showBlockedUserCandidates = false;
+    }, 140);
+  }
+
+  @action
+  onBlockedUsernameKeydown(event) {
+    if (event?.key === "Escape") {
+      this.showBlockedUserCandidates = false;
+    }
+  }
+
+  @action
+  selectBlockedUserCandidate(candidate, event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
+    if (!candidate?.username) {
+      return;
+    }
+
+    this.selectedBlockedUserCandidate = candidate;
+    this.blockedUsernameInput = candidate.username;
+    this.blockedUserCandidates = [];
+    this.showBlockedUserCandidates = false;
   }
 
   @action
   async addListenerBlock(event) {
     event?.preventDefault?.();
-    const username = this.blockedUsernameInput.trim().replace(/^@+/, "");
+    const username = this._cleanUsernameInput(
+      this.selectedBlockedUserCandidate?.username || this.blockedUsernameInput
+    );
     if (!username || this.addingListenerBlock) {
+      if (!username) {
+        this.dialog.alert(I18n.t("streamers_settings.listener_blocks_error_missing_username"));
+      }
       return;
     }
 
@@ -245,9 +369,12 @@ export default class StreamerSettingsComponent extends Component {
 
       this._mergeListenerBlocksPayload(response);
       this.blockedUsernameInput = "";
+      this._clearBlockedUserCandidates();
       this.toast?.success?.(I18n.t("streamers_settings.listener_blocks_added"));
-    } catch {
-      this.dialog.alert(I18n.t("streamers_settings.listener_blocks_add_error"));
+    } catch (error) {
+      this.dialog.alert(
+        this._listenerBlockErrorMessage(error, "streamers_settings.listener_blocks_add_error")
+      );
     } finally {
       this.addingListenerBlock = false;
     }
@@ -428,17 +555,67 @@ export default class StreamerSettingsComponent extends Component {
             </p>
 
             <form class="hb-stream-settings-block-form" {{on "submit" this.addListenerBlock}}>
-              <input
-                class="hb-stream-settings-input"
-                type="text"
-                value={{this.blockedUsernameInput}}
-                placeholder={{i18n "streamers_settings.listener_blocks_add_placeholder"}}
-                disabled={{this.addingListenerBlock}}
-                {{on "input" this.onBlockedUsernameInput}}
-              />
+              <div class="hb-stream-settings-block-search">
+                <input
+                  class="hb-stream-settings-input hb-stream-settings-block-input"
+                  type="text"
+                  value={{this.blockedUsernameInput}}
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder={{i18n "streamers_settings.listener_blocks_add_placeholder"}}
+                  disabled={{this.addingListenerBlock}}
+                  {{on "input" this.onBlockedUsernameInput}}
+                  {{on "focus" this.onBlockedUsernameFocus}}
+                  {{on "blur" this.onBlockedUsernameBlur}}
+                  {{on "keydown" this.onBlockedUsernameKeydown}}
+                />
+
+                {{#if this.showBlockedUserCandidateMenu}}
+                  <div class="hb-stream-settings-block-suggestions">
+                    {{#if this.searchingBlockedUsers}}
+                      <div class="hb-stream-settings-block-suggestion-empty">
+                        {{i18n "streamers_settings.listener_blocks_searching"}}
+                      </div>
+                    {{else if this.hasBlockedUserCandidates}}
+                      {{#each this.blockedUserCandidates as |candidate|}}
+                        <button
+                          type="button"
+                          class="hb-stream-settings-block-suggestion"
+                          {{on "mousedown" (fn this.selectBlockedUserCandidate candidate)}}
+                        >
+                          <span class="hb-stream-settings-block-suggestion-avatar">
+                            {{avatar
+                              candidate
+                              usernamePath="username"
+                              namePath="name"
+                              avatarTemplatePath="avatar_template"
+                              imageSize="small"
+                            }}
+                          </span>
+                          <span class="hb-stream-settings-block-suggestion-main">
+                            <span class="hb-stream-settings-block-suggestion-username">
+                              {{candidate.username}}
+                            </span>
+                            {{#if candidate.name}}
+                              <span class="hb-stream-settings-block-suggestion-name">
+                                {{candidate.name}}
+                              </span>
+                            {{/if}}
+                          </span>
+                        </button>
+                      {{/each}}
+                    {{else}}
+                      <div class="hb-stream-settings-block-suggestion-empty">
+                        {{i18n "streamers_settings.listener_blocks_no_matches"}}
+                      </div>
+                    {{/if}}
+                  </div>
+                {{/if}}
+              </div>
 
               <DButton
-                @class="btn btn-small"
+                @class="btn btn-small hb-stream-settings-block-submit"
                 @label="streamers_settings.listener_blocks_add"
                 @action={{this.addListenerBlock}}
                 @disabled={{this.addingListenerBlock}}
