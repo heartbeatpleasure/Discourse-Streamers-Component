@@ -20,6 +20,9 @@ export default class StreamerSettingsComponent extends Component {
   @tracked rotatingKey = false;
   @tracked savingStreamTag = false;
   @tracked selectedStreamTag = "";
+  @tracked blockedUsernameInput = "";
+  @tracked addingListenerBlock = false;
+  @tracked removingListenerBlockId = null;
 
   constructor() {
     super(...arguments);
@@ -88,6 +91,34 @@ export default class StreamerSettingsComponent extends Component {
 
   get showPublicListenUrl() {
     return !!this.settings?.public_listen_url_enabled && !!this.listenUrl;
+  }
+
+  get listenerBlocks() {
+    return this.settings?.listener_blocks || {};
+  }
+
+  get manualBlockedListeners() {
+    return this.listenerBlocks.manual_blocked_listeners || [];
+  }
+
+  get hasManualBlockedListeners() {
+    return this.manualBlockedListeners.length > 0;
+  }
+
+  get ignoredListenerBlockingEnabled() {
+    return !!this.listenerBlocks.ignored_listener_blocking_enabled;
+  }
+
+  get ignoredBlockedListenerCount() {
+    return Number(this.listenerBlocks.ignored_blocked_listener_count || 0);
+  }
+
+  get staffBypassListenerBlocks() {
+    return !!this.listenerBlocks.staff_bypass_listener_blocks;
+  }
+
+  get isRemovingListenerBlock() {
+    return this.removingListenerBlockId !== null;
   }
 
   get hasStreamKey() {
@@ -177,6 +208,68 @@ export default class StreamerSettingsComponent extends Component {
       this.dialog.alert(I18n.t("streamers_settings.stream_tag_save_error"));
     } finally {
       this.savingStreamTag = false;
+    }
+  }
+
+  _mergeListenerBlocksPayload(response) {
+    if (!response?.listener_blocks) {
+      return;
+    }
+
+    this.settings = {
+      ...this.settings,
+      listener_blocks: response.listener_blocks,
+    };
+  }
+
+  @action
+  onBlockedUsernameInput(event) {
+    this.blockedUsernameInput = event?.target?.value || "";
+  }
+
+  @action
+  async addListenerBlock(event) {
+    event?.preventDefault?.();
+    const username = this.blockedUsernameInput.trim().replace(/^@+/, "");
+    if (!username || this.addingListenerBlock) {
+      return;
+    }
+
+    this.addingListenerBlock = true;
+    try {
+      const response = await ajax("/streamers/me/listener_blocks", {
+        type: "POST",
+        data: { username },
+      });
+
+      this._mergeListenerBlocksPayload(response);
+      this.blockedUsernameInput = "";
+      this.toast?.success?.(I18n.t("streamers_settings.listener_blocks_added"));
+    } catch {
+      this.dialog.alert(I18n.t("streamers_settings.listener_blocks_add_error"));
+    } finally {
+      this.addingListenerBlock = false;
+    }
+  }
+
+  @action
+  async removeListenerBlock(listener) {
+    const userId = Number(listener?.user_id || 0);
+    if (!userId || this.removingListenerBlockId) {
+      return;
+    }
+
+    this.removingListenerBlockId = userId;
+    try {
+      const response = await ajax(`/streamers/me/listener_blocks/${userId}`, {
+        type: "DELETE",
+      });
+
+      this._mergeListenerBlocksPayload(response);
+    } catch {
+      this.dialog.alert(I18n.t("streamers_settings.listener_blocks_remove_error"));
+    } finally {
+      this.removingListenerBlockId = null;
     }
   }
 
@@ -323,6 +416,76 @@ export default class StreamerSettingsComponent extends Component {
               </p>
             </div>
           {{/if}}
+
+          <div class="hb-stream-settings-section hb-stream-settings-listener-blocks">
+            <div class="hb-stream-settings-label">
+              {{i18n "streamers_settings.listener_blocks_title"}}
+            </div>
+
+            <p class="hb-stream-settings-help">
+              {{i18n "streamers_settings.listener_blocks_help"}}
+            </p>
+
+            <form class="hb-stream-settings-block-form" {{on "submit" this.addListenerBlock}}>
+              <input
+                class="hb-stream-settings-input"
+                type="text"
+                value={{this.blockedUsernameInput}}
+                placeholder={{i18n "streamers_settings.listener_blocks_add_placeholder"}}
+                disabled={{this.addingListenerBlock}}
+                {{on "input" this.onBlockedUsernameInput}}
+              />
+
+              <DButton
+                @class="btn btn-small"
+                @label="streamers_settings.listener_blocks_add"
+                @action={{this.addListenerBlock}}
+                @disabled={{this.addingListenerBlock}}
+              />
+            </form>
+
+            {{#if this.hasManualBlockedListeners}}
+              <div class="hb-stream-settings-block-list">
+                {{#each this.manualBlockedListeners as |listener|}}
+                  <div class="hb-stream-settings-block-row">
+                    <span class="hb-stream-settings-block-user">
+                      {{avatar
+                        listener
+                        usernamePath="username"
+                        namePath="name"
+                        avatarTemplatePath="avatar_template"
+                        imageSize="small"
+                      }}
+                      <span>{{listener.username}}</span>
+                    </span>
+
+                    <DButton
+                      @class="btn btn-small"
+                      @label="streamers_settings.listener_blocks_remove"
+                      @action={{fn this.removeListenerBlock listener}}
+                      @disabled={{this.isRemovingListenerBlock}}
+                    />
+                  </div>
+                {{/each}}
+              </div>
+            {{else}}
+              <p class="hb-stream-settings-help">
+                {{i18n "streamers_settings.listener_blocks_empty"}}
+              </p>
+            {{/if}}
+
+            {{#if this.ignoredListenerBlockingEnabled}}
+              <p class="hb-stream-settings-help hb-stream-settings-block-ignored-count">
+                {{i18n "streamers_settings.listener_blocks_ignored_count" count=this.ignoredBlockedListenerCount}}
+              </p>
+            {{/if}}
+
+            {{#if this.staffBypassListenerBlocks}}
+              <p class="hb-stream-settings-help hb-stream-settings-block-staff-bypass">
+                {{i18n "streamers_settings.listener_blocks_staff_bypass"}}
+              </p>
+            {{/if}}
+          </div>
 
           <div class="hb-stream-settings-section">
             <div class="hb-stream-settings-label">

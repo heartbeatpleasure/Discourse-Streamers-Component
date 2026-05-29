@@ -11,7 +11,7 @@ export default class StreamersListenButton extends Component {
   }
 
   get disabled() {
-    return !this.stream?.listen_url;
+    return !!this.stream?.listener_blocked || !this.stream?.listen_url;
   }
 
   get isCurrent() {
@@ -23,6 +23,7 @@ export default class StreamersListenButton extends Component {
   }
 
   get labelKey() {
+    if (this.stream?.listener_blocked) return "hb_streamers.listen_unavailable";
     if (this.disabled) return "hb_streamers.listen";
     if (!this.isCurrent) return "hb_streamers.listen";
     if (this.streamersPlayer.isLoading) return "hb_streamers.loading";
