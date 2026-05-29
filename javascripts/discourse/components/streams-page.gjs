@@ -104,6 +104,10 @@ export default class StreamsPageComponent extends Component {
     return Number(this.listenerDialogStream?.public_listener_count || 0);
   }
 
+  get listenerDialogDetailsVisible() {
+    return this.listenerDialogStream?.listener_details_visible !== false;
+  }
+
   get listenerDialogUsername() {
     return this.listenerDialogStream?.username || this.listenerDialogStream?.name || "";
   }
@@ -298,47 +302,53 @@ export default class StreamsPageComponent extends Component {
             </button>
           </div>
 
-          {{#if this.listenerDialogKnownListeners.length}}
-            <div class="hb-stream-listeners-list">
-              {{#each this.listenerDialogKnownListeners as |listener|}}
-                <a
-                  class="hb-stream-listener-row"
-                  href={{hbUserProfileUrl listener.username}}
-                  title={{listener.username}}
-                >
-                  <span class="hb-stream-listener-avatar">
-                    {{avatar
-                      listener
-                      usernamePath="username"
-                      namePath="name"
-                      avatarTemplatePath="avatar_template"
-                      imageSize="large"
-                    }}
-                  </span>
-
-                  <span class="hb-stream-listener-main">
-                    <span class="hb-stream-listener-name">
-                      {{listener.username}}
+          {{#if this.listenerDialogDetailsVisible}}
+            {{#if this.listenerDialogKnownListeners.length}}
+              <div class="hb-stream-listeners-list">
+                {{#each this.listenerDialogKnownListeners as |listener|}}
+                  <a
+                    class="hb-stream-listener-row"
+                    href={{hbUserProfileUrl listener.username}}
+                    title={{listener.username}}
+                  >
+                    <span class="hb-stream-listener-avatar">
+                      {{avatar
+                        listener
+                        usernamePath="username"
+                        namePath="name"
+                        avatarTemplatePath="avatar_template"
+                        imageSize="large"
+                      }}
                     </span>
 
-                    {{#if listener.has_multiple_sessions}}
-                      <span class="hb-stream-listener-sessions">
-                        {{i18n "streamers.listener_sessions" count=listener.session_count}}
+                    <span class="hb-stream-listener-main">
+                      <span class="hb-stream-listener-name">
+                        {{listener.username}}
                       </span>
-                    {{/if}}
-                  </span>
-                </a>
-              {{/each}}
-            </div>
+
+                      {{#if listener.has_multiple_sessions}}
+                        <span class="hb-stream-listener-sessions">
+                          {{i18n "streamers.listener_sessions" count=listener.session_count}}
+                        </span>
+                      {{/if}}
+                    </span>
+                  </a>
+                {{/each}}
+              </div>
+            {{else}}
+              <p class="hb-stream-listeners-empty">
+                {{i18n "streamers.listeners_none_known"}}
+              </p>
+            {{/if}}
+
+            {{#if this.listenerDialogPublicCount}}
+              <p class="hb-stream-listeners-public">
+                {{i18n "streamers.listeners_public" count=this.listenerDialogPublicCount}}
+              </p>
+            {{/if}}
           {{else}}
             <p class="hb-stream-listeners-empty">
-              {{i18n "streamers.listeners_none_known"}}
-            </p>
-          {{/if}}
-
-          {{#if this.listenerDialogPublicCount}}
-            <p class="hb-stream-listeners-public">
-              {{i18n "streamers.listeners_public" count=this.listenerDialogPublicCount}}
+              {{i18n "streamers.listeners_hidden"}}
             </p>
           {{/if}}
         </section>
