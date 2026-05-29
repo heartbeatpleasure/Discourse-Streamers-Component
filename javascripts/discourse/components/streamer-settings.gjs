@@ -550,9 +550,17 @@ export default class StreamerSettingsComponent extends Component {
               {{i18n "streamers_settings.listener_blocks_title"}}
             </div>
 
-            <p class="hb-stream-settings-help">
-              {{i18n "streamers_settings.listener_blocks_help"}}
-            </p>
+            <div class="hb-stream-settings-help hb-stream-settings-block-help">
+              <p>
+                {{i18n "streamers_settings.listener_blocks_help"}}
+              </p>
+
+              {{#if this.showPublicListenUrl}}
+                <p class="hb-stream-settings-block-public-warning">
+                  {{i18n "streamers_settings.listener_blocks_public_warning"}}
+                </p>
+              {{/if}}
+            </div>
 
             <form class="hb-stream-settings-block-form" {{on "submit" this.addListenerBlock}}>
               <div class="hb-stream-settings-block-search">
