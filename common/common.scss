@@ -829,24 +829,29 @@
 // --- Blocked listeners autocomplete / polish -------------------------------
 
 .hb-stream-settings-block-form {
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .hb-stream-settings-block-search {
   position: relative;
   flex: 1 1 340px;
-  max-width: min(100%, 520px);
+  max-width: min(100%, 620px);
 }
 
 .hb-stream-settings-block-input {
   width: 100%;
   min-width: 280px;
+  height: 48px;
+  box-sizing: border-box;
 }
 
-.hb-stream-settings-block-submit {
-  min-height: 40px;
+.hb-stream-settings-block-submit.btn {
+  height: 48px;
+  min-height: 48px;
   margin-top: 0;
-  align-self: stretch;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
 }
 
 .hb-stream-settings-block-suggestions {
@@ -932,6 +937,40 @@
 
 
 /* Keep native Discourse user cards above the stream listener modal/backdrop. */
+html.hb-stream-listeners-open,
+body.hb-stream-listeners-open {
+  #d-menu-portals,
+  .d-menu-portals,
+  .fk-d-menu-modal,
+  .fk-d-menu-content,
+  .floating-ui-portal,
+  .ember-basic-dropdown-content,
+  #user-card,
+  #group-card,
+  .user-card,
+  .group-card,
+  .hb-stream-native-card-layer {
+    z-index: 2147483000 !important;
+  }
+
+  #user-card,
+  #group-card,
+  .user-card,
+  .group-card,
+  .hb-stream-native-card-popup {
+    z-index: 2147483001 !important;
+  }
+
+  #d-menu-portals,
+  .d-menu-portals,
+  .fk-d-menu-modal,
+  .fk-d-menu-content,
+  .floating-ui-portal,
+  .ember-basic-dropdown-content {
+    position: relative;
+  }
+}
+
 #d-menu-portals.hb-stream-native-card-layer,
 .d-menu-portals.hb-stream-native-card-layer,
 .fk-d-menu-modal.hb-stream-native-card-layer,
@@ -952,4 +991,42 @@
 .group-card.hb-stream-native-card-popup,
 .hb-stream-native-card-popup {
   z-index: 2147483001 !important;
+}
+
+/* Listener dialog polish */
+.hb-stream-listeners-dialog-header {
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.05rem;
+}
+
+.hb-stream-listeners-title {
+  margin-top: 0;
+  line-height: 1.12;
+}
+
+.hb-stream-listeners-list {
+  max-height: min(52vh, 430px);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.hb-stream-listeners-empty,
+.hb-stream-listeners-public {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .hb-stream-listeners-dialog {
+    max-height: calc(100vh - 2rem);
+    overflow: hidden;
+  }
+
+  .hb-stream-listeners-list {
+    max-height: 58vh;
+  }
+
+  .hb-stream-listeners-title {
+    font-size: 1.65rem;
+  }
 }

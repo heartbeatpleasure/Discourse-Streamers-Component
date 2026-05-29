@@ -87,6 +87,7 @@ export default class StreamsPageComponent extends Component {
       registerDestructor(this, () => {
         window.removeEventListener(PAGE_EVENT, this._handlePageUpdate);
         this._clearNativeCardLayer();
+        this._setNativeCardLayerOpen(false);
       });
     }
 
@@ -110,6 +111,18 @@ export default class StreamsPageComponent extends Component {
 
   get listenerDialogDetailsVisible() {
     return this.listenerDialogStream?.listener_details_visible !== false;
+  }
+
+  get listenerDialogHasKnownListeners() {
+    return this.listenerDialogKnownListeners.length > 0;
+  }
+
+  get listenerDialogHasPublicListeners() {
+    return this.listenerDialogPublicCount > 0;
+  }
+
+  get listenerDialogShowEmpty() {
+    return !this.listenerDialogHasKnownListeners && !this.listenerDialogHasPublicListeners;
   }
 
   get listenerDialogUsername() {
@@ -154,15 +167,26 @@ export default class StreamsPageComponent extends Component {
       const refreshedStream = this.state.live_streams.find(
         (stream) => stream.mount === this.listenerDialogStream.mount
       );
-      this.listenerDialogStream = refreshedStream || null;
+      this.listenerDialogStream = this._canOpenListenerDialog(refreshedStream) ? refreshedStream : null;
+      if (!this.listenerDialogStream) {
+        this._setNativeCardLayerOpen(false);
+      }
     }
 
     this._syncLastUpdatedDisplay(this.state, { ensureFallback: true });
   }
 
-  @action
-  openListenerDialog(stream) {
-    this.listenerDialogStream = stream;
+  _canOpenListenerDialog(stream) {
+    return !!stream && stream.listener_details_visible !== false && Number(stream.listeners || 0) > 0;
+  }
+
+  _setNativeCardLayerOpen(open) {
+    try {
+      document?.documentElement?.classList?.toggle("hb-stream-listeners-open", !!open);
+      document?.body?.classList?.toggle("hb-stream-listeners-open", !!open);
+    } catch {
+      // ignore
+    }
   }
 
   cleanUsername(username) {
@@ -261,6 +285,7 @@ export default class StreamsPageComponent extends Component {
     apply();
     setTimeout(apply, 60);
     setTimeout(apply, 180);
+    setTimeout(apply, 360);
   }
 
   _triggerNativeUserCard(username, event) {
@@ -268,7 +293,6 @@ export default class StreamsPageComponent extends Component {
       return;
     }
 
-    // Keep normal profile-link behavior for modified clicks / new-tab actions.
     if (event.button && event.button !== 0) {
       return;
     }
@@ -288,9 +312,27 @@ export default class StreamsPageComponent extends Component {
 
     event.preventDefault?.();
     event.stopPropagation?.();
+    this._setNativeCardLayerOpen(true);
     this._raiseNativeCardLayer();
     this.appEvents.trigger("topic-header:trigger-user-card", cleanedUsername, target, event);
     this._raiseNativeCardLayer();
+  }
+
+  @action
+  openListenerDialog(stream) {
+    if (!this._canOpenListenerDialog(stream)) {
+      return;
+    }
+
+    this.listenerDialogStream = stream;
+    this._setNativeCardLayerOpen(true);
+  }
+
+  @action
+  closeListenerDialog() {
+    this.listenerDialogStream = null;
+    this._clearNativeCardLayer();
+    this._setNativeCardLayerOpen(false);
   }
 
   @action
@@ -301,12 +343,6 @@ export default class StreamsPageComponent extends Component {
   @action
   handleListenerUserClick(listener, event) {
     this._triggerNativeUserCard(listener?.username, event);
-  }
-
-  @action
-  closeListenerDialog() {
-    this.listenerDialogStream = null;
-    this._clearNativeCardLayer();
   }
 
   <template>
@@ -385,13 +421,19 @@ export default class StreamsPageComponent extends Component {
 
                 <div class="hb-stream-meta">
                   {{#if stream.listener_details_visible}}
-                    <button
-                      type="button"
-                      class="hb-stream-listeners-trigger"
-                      {{on "click" (fn this.openListenerDialog stream)}}
-                    >
-                      {{i18n "streamers.listeners" count=stream.listeners}}
-                    </button>
+                    {{#if stream.listeners}}
+                      <button
+                        type="button"
+                        class="hb-stream-listeners-trigger"
+                        {{on "click" (fn this.openListenerDialog stream)}}
+                      >
+                        {{i18n "streamers.listeners" count=stream.listeners}}
+                      </button>
+                    {{else}}
+                      <span class="hb-stream-meta-item">
+                        {{i18n "streamers.listeners" count=stream.listeners}}
+                      </span>
+                    {{/if}}
                   {{else}}
                     <span class="hb-stream-meta-item">
                       {{i18n "streamers.listeners" count=stream.listeners}}
@@ -437,9 +479,6 @@ export default class StreamsPageComponent extends Component {
         >
           <div class="hb-stream-listeners-dialog-header">
             <div>
-              <div class="hb-stream-listeners-eyebrow">
-                {{i18n "streamers.listeners_known"}}
-              </div>
               <h2 class="hb-stream-listeners-title">
                 {{i18n "streamers.listeners_title" username=this.listenerDialogUsername}}
               </h2>
@@ -455,55 +494,51 @@ export default class StreamsPageComponent extends Component {
             </button>
           </div>
 
-          {{#if this.listenerDialogDetailsVisible}}
-            {{#if this.listenerDialogKnownListeners.length}}
-              <div class="hb-stream-listeners-list">
-                {{#each this.listenerDialogKnownListeners as |listener|}}
-                  <a
-                    class="hb-stream-listener-row trigger-user-card"
-                    href={{hbUserProfileUrl listener.username}}
-                    data-user-card={{this.cleanUsername listener.username}}
-                    title={{listener.username}}
-                    {{on "click" (fn this.handleListenerUserClick listener)}}
-                  >
-                    <span class="hb-stream-listener-avatar">
-                      {{avatar
-                        listener
-                        usernamePath="username"
-                        namePath="name"
-                        avatarTemplatePath="avatar_template"
-                        imageSize="large"
-                      }}
+          {{#if this.listenerDialogHasKnownListeners}}
+            <div class="hb-stream-listeners-list">
+              {{#each this.listenerDialogKnownListeners as |listener|}}
+                <a
+                  class="hb-stream-listener-row trigger-user-card"
+                  href={{hbUserProfileUrl listener.username}}
+                  data-user-card={{this.cleanUsername listener.username}}
+                  title={{listener.username}}
+                  {{on "click" (fn this.handleListenerUserClick listener)}}
+                >
+                  <span class="hb-stream-listener-avatar">
+                    {{avatar
+                      listener
+                      usernamePath="username"
+                      namePath="name"
+                      avatarTemplatePath="avatar_template"
+                      imageSize="large"
+                    }}
+                  </span>
+
+                  <span class="hb-stream-listener-main">
+                    <span class="hb-stream-listener-name">
+                      {{listener.username}}
                     </span>
 
-                    <span class="hb-stream-listener-main">
-                      <span class="hb-stream-listener-name">
-                        {{listener.username}}
+                    {{#if listener.has_multiple_sessions}}
+                      <span class="hb-stream-listener-sessions">
+                        {{i18n "streamers.listener_sessions" count=listener.session_count}}
                       </span>
+                    {{/if}}
+                  </span>
+                </a>
+              {{/each}}
+            </div>
+          {{/if}}
 
-                      {{#if listener.has_multiple_sessions}}
-                        <span class="hb-stream-listener-sessions">
-                          {{i18n "streamers.listener_sessions" count=listener.session_count}}
-                        </span>
-                      {{/if}}
-                    </span>
-                  </a>
-                {{/each}}
-              </div>
-            {{else}}
-              <p class="hb-stream-listeners-empty">
-                {{i18n "streamers.listeners_none_known"}}
-              </p>
-            {{/if}}
-
-            {{#if this.listenerDialogPublicCount}}
-              <p class="hb-stream-listeners-public">
-                {{i18n "streamers.listeners_public" count=this.listenerDialogPublicCount}}
-              </p>
-            {{/if}}
-          {{else}}
+          {{#if this.listenerDialogShowEmpty}}
             <p class="hb-stream-listeners-empty">
-              {{i18n "streamers.listeners_hidden"}}
+              {{i18n "streamers.listeners_none_known"}}
+            </p>
+          {{/if}}
+
+          {{#if this.listenerDialogHasPublicListeners}}
+            <p class="hb-stream-listeners-public">
+              {{i18n "streamers.listeners_public" count=this.listenerDialogPublicCount}}
             </p>
           {{/if}}
         </section>
