@@ -22,6 +22,7 @@ export default class StreamersPlayerService extends Service {
   @tracked errorMessage = null;
 
   _audio = null;
+  _playRequestId = 0;
 
   constructor() {
     super(...arguments);
@@ -33,9 +34,23 @@ export default class StreamersPlayerService extends Service {
     audio.muted = false;
     audio.volume = 1;
     audio.setAttribute("playsinline", "");
+    audio.setAttribute("webkit-playsinline", "");
+    audio.setAttribute("disableRemotePlayback", "");
+    audio.setAttribute("x-webkit-airplay", "deny");
+
+    try {
+      audio.disableRemotePlayback = true;
+    } catch {
+      // ignore browsers without disableRemotePlayback support
+    }
+
     audio.style.display = "none";
 
     audio.addEventListener("playing", () => {
+      if (!this.currentStream || this.status === "stopped") {
+        return;
+      }
+
       this.status = "playing";
       this.errorMessage = null;
     });
@@ -46,7 +61,10 @@ export default class StreamersPlayerService extends Service {
     });
 
     audio.addEventListener("error", () => {
-      if (!this.currentStream) return;
+      if (!this.currentStream || this.status === "stopped") {
+        return;
+      }
+
       this.status = "error";
       this.errorMessage = "Playback error.";
     });
@@ -90,12 +108,8 @@ export default class StreamersPlayerService extends Service {
   }
 
   stop() {
-    if (this._audio) {
-      try {
-        this._audio.pause();
-      } catch {}
-      this._audio.src = "";
-    }
+    this._playRequestId += 1;
+    this._resetAudioSource();
 
     this.currentStream = null;
     this.status = "stopped";
@@ -113,18 +127,29 @@ export default class StreamersPlayerService extends Service {
   async resume(preferredStream = null) {
     if (!this._audio || !this.currentStream?.mount) return;
 
+    const requestId = ++this._playRequestId;
     this.status = "loading";
     this.errorMessage = null;
 
     try {
       const freshStream = await this._freshStreamForResume(preferredStream);
+      if (requestId !== this._playRequestId) {
+        return;
+      }
+
       if (!freshStream?.listen_url) {
         throw new Error("Stream is no longer available.");
       }
 
-      this._applyStream(freshStream, { replaceSource: true });
+      this._applyStream(freshStream);
+      this._setAudioSource(freshStream.listen_url);
+      this.status = "loading";
       await this._audio.play();
     } catch (e) {
+      if (requestId !== this._playRequestId) {
+        return;
+      }
+
       this.status = "error";
       this.errorMessage = e?.message || "Could not start playback.";
     }
@@ -154,7 +179,7 @@ export default class StreamersPlayerService extends Service {
     return freshStream;
   }
 
-  _applyStream(stream, { replaceSource = false } = {}) {
+  _applyStream(stream) {
     this.currentStream = {
       user_id: stream.user_id,
       username: stream.username,
@@ -164,10 +189,41 @@ export default class StreamersPlayerService extends Service {
       listen_url: stream.listen_url,
       title: stream.title,
     };
+  }
 
-    if (replaceSource && this._audio && stream.listen_url && this._audio.src !== stream.listen_url) {
-      this._audio.src = stream.listen_url;
+  _resetAudioSource() {
+    if (!this._audio) {
+      return;
     }
+
+    try {
+      this._audio.pause();
+    } catch {}
+
+    try {
+      this._audio.removeAttribute("src");
+      this._audio.src = "";
+      this._audio.load();
+    } catch {
+      try {
+        this._audio.src = "";
+      } catch {}
+    }
+  }
+
+  _setAudioSource(url) {
+    if (!this._audio || !url) {
+      return;
+    }
+
+    const attrSrc = this._audio.getAttribute("src") || "";
+    const currentSrc = this._audio.currentSrc || this._audio.src || "";
+    if (attrSrc === url || currentSrc === url) {
+      return;
+    }
+
+    this._resetAudioSource();
+    this._audio.src = url;
   }
 
   async playOrToggle(stream) {
@@ -181,29 +237,29 @@ export default class StreamersPlayerService extends Service {
     if (same) {
       if (this.isPlaying) return this.pause();
       if (this.isPaused) return this.resume(stream);
-      // loading/error -> opnieuw proberen
+      if (this.isLoading) return;
+      // error -> probeer opnieuw met de nieuwste streamdata
     }
 
+    const requestId = ++this._playRequestId;
     this._applyStream(stream);
 
     if (!this._audio) return;
 
     this._audio.muted = this.muted;
     this._audio.volume = this.volume;
-
-    // reset voor nette switch
-    try {
-      this._audio.pause();
-    } catch {}
-
-    this._audio.src = stream.listen_url;
-    this.status = "loading";
     this.errorMessage = null;
+    this._setAudioSource(stream.listen_url);
+    this.status = "loading";
 
     try {
       await this._audio.play();
       // status wordt ook gezet door 'playing' event
     } catch (e) {
+      if (requestId !== this._playRequestId) {
+        return;
+      }
+
       this.status = "error";
       this.errorMessage = e?.message || "Could not start playback.";
     }
