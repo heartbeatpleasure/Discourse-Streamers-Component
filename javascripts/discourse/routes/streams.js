@@ -1,5 +1,6 @@
 // assets/javascripts/discourse/routes/streams.js
 import DiscourseRoute from "discourse/routes/discourse";
+import { i18n } from "discourse-i18n";
 import { ajax } from "discourse/lib/ajax";
 import moment from "moment";
 import { later, cancel } from "@ember/runloop";
@@ -78,6 +79,10 @@ function publishPageUpdate(state) {
 export default class StreamsRoute extends DiscourseRoute {
   pollTimer = null;
   isPolling = false;
+
+  titleToken() {
+    return i18n("streamers.page_title");
+  }
 
   async model() {
     const streamsData = await ajax(noCacheUrl("/streams.json"));
